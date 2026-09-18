@@ -125,7 +125,9 @@ export default function HistorySurvey({
         status: filters.status || '',
         assessment_type: filters.assessment_type || '',
         sort_by:
-            filters.sort_by === 'submitted_at' ? filters.sort_by : 'submitted_at',
+            filters.sort_by === 'submitted_at'
+                ? filters.sort_by
+                : 'submitted_at',
         sort_order: filters.sort_order || 'desc',
         per_page: filters.per_page || 10,
     });

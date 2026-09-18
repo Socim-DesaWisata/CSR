@@ -322,8 +322,8 @@ export default function ProjectForm({
                                 type.id === 'ikm'
                                     ? data.enable_ikm
                                     : type.id === 'sloi'
-                                        ? data.enable_sloi
-                                        : data.enable_sroi
+                                      ? data.enable_sloi
+                                      : data.enable_sroi
                             }
                             onChange={(checked) =>
                                 handleAssessmentTypeChange(type.id, checked)
@@ -607,14 +607,14 @@ export default function ProjectForm({
                                     {errors[
                                         `descriptive_questions.${idx}.title`
                                     ] && (
-                                            <p className="mt-1 text-xs text-red-500">
-                                                {
-                                                    errors[
+                                        <p className="mt-1 text-xs text-red-500">
+                                            {
+                                                errors[
                                                     `descriptive_questions.${idx}.title`
-                                                    ]
-                                                }
-                                            </p>
-                                        )}
+                                                ]
+                                            }
+                                        </p>
+                                    )}
                                 </div>
                                 <button
                                     type="button"

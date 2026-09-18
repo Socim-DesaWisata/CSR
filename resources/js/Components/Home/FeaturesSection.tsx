@@ -222,7 +222,7 @@ export default function FeaturesSection() {
                     onClick={() => setExpandedFeature(null)}
                 >
                     <div
-                        className="relative flex w-full max-w-5xl max-h-[90vh] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl md:flex-row"
+                        className="relative flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl md:flex-row"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close button */}

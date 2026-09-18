@@ -2,10 +2,10 @@ import { ReactNode } from 'react';
 
 import {
     SLOIAgeRangeChart,
+    SLOIAspectTable,
     SLOIEducationChart,
     SLOIGenderPieChart,
     SLOIHeader,
-    SLOIAspectTable,
     SLOIQuestionScores,
     SLOIScoreGauge,
 } from './SLOI';

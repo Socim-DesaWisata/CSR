@@ -174,19 +174,19 @@ function RadialGauge({
                                                     fill: '#0f172a',
                                                     fontSize: 22,
                                                     fontWeight: 700,
-                                            }}
-                                        >
-                                            {value.toFixed(2)}
-                                        </tspan>
+                                                }}
+                                            >
+                                                {value.toFixed(2)}
+                                            </tspan>
                                             <tspan
                                                 x={viewBox.cx}
                                                 y={(viewBox.cy ?? 0) + 18}
                                                 style={{
                                                     fill: '#94a3b8',
                                                     fontSize: 9,
-                                            fontWeight: 500,
-                                        }}
-                                    >
+                                                    fontWeight: 500,
+                                                }}
+                                            >
                                                 {conversion.label}
                                             </tspan>
                                         </text>
@@ -264,7 +264,10 @@ export default function IKMScoreGauge({
                         </thead>
                         <tbody>
                             {conversionRows.map((row) => (
-                                <tr key={row.perception} className="bg-white text-[10px]">
+                                <tr
+                                    key={row.perception}
+                                    className="bg-white text-[10px]"
+                                >
                                     <td className="border-r border-slate-100 px-1 py-0.5 text-center font-medium">
                                         {row.perception}
                                     </td>

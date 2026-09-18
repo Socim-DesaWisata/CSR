@@ -136,17 +136,13 @@ export default function ServingQuality({
                         <p className="font-semibold text-slate-800">
                             Serving Quality
                         </p>
-                        <p>
-                            Kinerja - Kepentingan
-                        </p>
+                        <p>Kinerja - Kepentingan</p>
                     </div>
                     <div>
                         <p className="font-semibold text-slate-800">
                             Tingkat Kesesuaian Indikator
                         </p>
-                        <p>
-                            Kinerja / Kepentingan
-                        </p>
+                        <p>Kinerja / Kepentingan</p>
                     </div>
                 </div>
             </div>

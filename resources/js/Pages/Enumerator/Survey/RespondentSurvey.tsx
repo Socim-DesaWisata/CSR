@@ -217,22 +217,30 @@ export default function RespondentSurvey({
         // Answers: [{question_id, type, value}, ...]
         // Key format: `${questionId}-${type}` e.g. "3-ikm-kepentingan", "3-ikm-kinerja", "5-sloi"
         if (isSroi) {
-            Object.entries(sroiAnswers).forEach(([questionId, value], index) => {
-                const question = projectSroiForm?.sections
-                    .flatMap((section) => section.questions)
-                    .find((item) => item.id === Number(questionId));
+            Object.entries(sroiAnswers).forEach(
+                ([questionId, value], index) => {
+                    const question = projectSroiForm?.sections
+                        .flatMap((section) => section.questions)
+                        .find((item) => item.id === Number(questionId));
 
-                formData.append(
-                    `sroi_answers[${index}][project_sroi_question_id]`,
-                    questionId,
-                );
+                    formData.append(
+                        `sroi_answers[${index}][project_sroi_question_id]`,
+                        questionId,
+                    );
 
-                if (question?.answerType === 'number') {
-                    formData.append(`sroi_answers[${index}][value_number]`, value);
-                } else {
-                    formData.append(`sroi_answers[${index}][value_text]`, value);
-                }
-            });
+                    if (question?.answerType === 'number') {
+                        formData.append(
+                            `sroi_answers[${index}][value_number]`,
+                            value,
+                        );
+                    } else {
+                        formData.append(
+                            `sroi_answers[${index}][value_text]`,
+                            value,
+                        );
+                    }
+                },
+            );
         } else {
             Object.entries(answers).forEach(([key, value], index) => {
                 const dashIdx = key.indexOf('-');
@@ -371,10 +379,12 @@ export default function RespondentSurvey({
                 <RespondentForm
                     data={respondentData}
                     isSroi={isSroi}
-                    stakeholderOptions={projectStakeholders.map((stakeholder) => ({
-                        value: String(stakeholder.id),
-                        label: stakeholder.name,
-                    }))}
+                    stakeholderOptions={projectStakeholders.map(
+                        (stakeholder) => ({
+                            value: String(stakeholder.id),
+                            label: stakeholder.name,
+                        }),
+                    )}
                     onChange={setRespondentData}
                     onBack={handleBackFromRespondent}
                     onNext={() => goToStep(2)}
@@ -409,7 +419,13 @@ export default function RespondentSurvey({
                     surveyType={surveyType}
                     projectSroiForm={projectSroiForm}
                     sroiAnswers={sroiAnswers}
-                    stakeholderName={projectStakeholders.find((item) => String(item.id) === respondentData.stakeholder_id)?.name ?? null}
+                    stakeholderName={
+                        projectStakeholders.find(
+                            (item) =>
+                                String(item.id) ===
+                                respondentData.stakeholder_id,
+                        )?.name ?? null
+                    }
                     gpsLocation={gpsLocation}
                     onBack={() => goToStep(2)}
                     onEditRespondent={() => goToStep(1)}

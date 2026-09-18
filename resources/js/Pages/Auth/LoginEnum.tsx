@@ -2,7 +2,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Head, useForm } from '@inertiajs/react';
-import { Eye, EyeOff, Leaf } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 export default function LoginEnum({ status }: { status?: string }) {
@@ -23,7 +23,7 @@ export default function LoginEnum({ status }: { status?: string }) {
 
     return (
         <div
-            className="min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative"
+            className="relative flex min-h-screen w-full items-center justify-center bg-cover bg-center bg-no-repeat p-4"
             style={{ backgroundImage: 'url("/img/bg-team.jpeg")' }}
         >
             {/* Dark overlay to make text readable */}
@@ -31,15 +31,19 @@ export default function LoginEnum({ status }: { status?: string }) {
 
             <Head title="Enumerator Login" />
 
-            <div className="relative z-10 w-full max-w-md overflow-hidden rounded-3xl bg-white/10 p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] backdrop-blur-xl border border-white/20 transition-all duration-300">
+            <div className="relative z-10 w-full max-w-md overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] backdrop-blur-xl transition-all duration-300">
                 <div className="mb-8 text-center">
-                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg overflow-hidden">
-                        <img src="/img/LogoTab.png" alt="SocialImpact Logo" className="h-10 w-10 object-contain" />
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg">
+                        <img
+                            src="/img/LogoTab.png"
+                            alt="SocialImpact Logo"
+                            className="h-10 w-10 object-contain"
+                        />
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-md">
                         Impact Report Management
                     </h1>
-                    <p className="mt-2 text-sm text-green-100 font-medium">
+                    <p className="mt-2 text-sm font-medium text-green-100">
                         Enumerator Mobile Access
                     </p>
                 </div>
@@ -51,10 +55,10 @@ export default function LoginEnum({ status }: { status?: string }) {
                 )}
 
                 <form onSubmit={submit} className="space-y-5">
-                    <div className="space-y-2 relative group">
+                    <div className="group relative space-y-2">
                         <Label
                             htmlFor="email"
-                            className="text-green-50 ml-1 text-sm font-medium transition-colors group-focus-within:text-white drop-shadow-sm"
+                            className="ml-1 text-sm font-medium text-green-50 drop-shadow-sm transition-colors group-focus-within:text-white"
                         >
                             Email
                         </Label>
@@ -67,19 +71,19 @@ export default function LoginEnum({ status }: { status?: string }) {
                             placeholder="nama@email.com"
                             autoComplete="email"
                             autoFocus
-                            className="h-12 rounded-xl border-white/20 bg-white/10 text-white placeholder:text-white/50 focus:border-white/50 focus:bg-white/20 focus:ring-0 focus:outline-none transition-all duration-300"
+                            className="h-12 rounded-xl border-white/20 bg-white/10 text-white transition-all duration-300 placeholder:text-white/50 focus:border-white/50 focus:bg-white/20 focus:outline-none focus:ring-0"
                         />
                         {errors.email && (
-                            <p className="mt-1 ml-1 text-sm font-medium text-red-300 bg-red-900/40 px-2 py-1 rounded-md inline-block backdrop-blur-md">
+                            <p className="ml-1 mt-1 inline-block rounded-md bg-red-900/40 px-2 py-1 text-sm font-medium text-red-300 backdrop-blur-md">
                                 {errors.email}
                             </p>
                         )}
                     </div>
 
-                    <div className="space-y-2 relative group">
+                    <div className="group relative space-y-2">
                         <Label
                             htmlFor="password"
-                            className="text-green-50 ml-1 text-sm font-medium transition-colors group-focus-within:text-white drop-shadow-sm"
+                            className="ml-1 text-sm font-medium text-green-50 drop-shadow-sm transition-colors group-focus-within:text-white"
                         >
                             Password
                         </Label>
@@ -89,15 +93,17 @@ export default function LoginEnum({ status }: { status?: string }) {
                                 type={showPassword ? 'text' : 'password'}
                                 name="password"
                                 value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
+                                onChange={(e) =>
+                                    setData('password', e.target.value)
+                                }
                                 autoComplete="current-password"
                                 placeholder="••••••••"
-                                className="h-12 rounded-xl border-white/20 bg-white/10 text-white placeholder:text-white/50 focus:border-white/50 focus:bg-white/20 focus:ring-0 focus:outline-none transition-all duration-300 pr-12"
+                                className="h-12 rounded-xl border-white/20 bg-white/10 pr-12 text-white transition-all duration-300 placeholder:text-white/50 focus:border-white/50 focus:bg-white/20 focus:outline-none focus:ring-0"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword((v) => !v)}
-                                className="absolute inset-y-0 right-0 flex h-full w-12 items-center justify-center text-white/70 hover:text-white transition-colors outline-none"
+                                className="absolute inset-y-0 right-0 flex h-full w-12 items-center justify-center text-white/70 outline-none transition-colors hover:text-white"
                                 tabIndex={-1}
                             >
                                 {showPassword ? (
@@ -108,7 +114,7 @@ export default function LoginEnum({ status }: { status?: string }) {
                             </button>
                         </div>
                         {errors.password && (
-                            <p className="mt-1 ml-1 text-sm font-medium text-red-300 bg-red-900/40 px-2 py-1 rounded-md inline-block backdrop-blur-md">
+                            <p className="ml-1 mt-1 inline-block rounded-md bg-red-900/40 px-2 py-1 text-sm font-medium text-red-300 backdrop-blur-md">
                                 {errors.password}
                             </p>
                         )}
@@ -117,15 +123,17 @@ export default function LoginEnum({ status }: { status?: string }) {
                     <Button
                         type="submit"
                         disabled={processing}
-                        className="mt-8 h-12 w-full rounded-xl bg-green-600 text-white hover:bg-green-500 hover:scale-[1.02] active:scale-95 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl border border-green-500/50"
+                        className="mt-8 h-12 w-full rounded-xl border border-green-500/50 bg-green-600 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-green-500 hover:shadow-xl active:scale-95"
                     >
                         {processing ? 'Memproses...' : 'Masuk'}
                     </Button>
                 </form>
             </div>
 
-            <div className="fixed bottom-6 text-center w-full pointer-events-none z-10">
-                <p className="text-white/80 text-xs font-medium drop-shadow-md tracking-wider uppercase">CSR Management System</p>
+            <div className="pointer-events-none fixed bottom-6 z-10 w-full text-center">
+                <p className="text-xs font-medium uppercase tracking-wider text-white/80 drop-shadow-md">
+                    CSR Management System
+                </p>
             </div>
         </div>
     );

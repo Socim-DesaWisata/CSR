@@ -158,7 +158,8 @@ export default function EditSurvey({
 
     const stakeholderName =
         projectStakeholders.find(
-            (stakeholder) => String(stakeholder.id) === respondentData.stakeholder_id,
+            (stakeholder) =>
+                String(stakeholder.id) === respondentData.stakeholder_id,
         )?.name ?? null;
 
     const goToStep = (step: 1 | 2 | 3) => setCurrentStep(step);
@@ -224,7 +225,10 @@ export default function EditSurvey({
                     );
 
                     if (question.answerType === 'number') {
-                        fd.append(`sroi_answers[${index}][value_number]`, value);
+                        fd.append(
+                            `sroi_answers[${index}][value_number]`,
+                            value,
+                        );
                     } else {
                         fd.append(`sroi_answers[${index}][value_text]`, value);
                     }
@@ -271,7 +275,8 @@ export default function EditSurvey({
         }
 
         if (isSroi) {
-            const requiredQuestions = getSroiAnswerableQuestions(projectSroiForm);
+            const requiredQuestions =
+                getSroiAnswerableQuestions(projectSroiForm);
 
             if (!respondentData.stakeholder_id) {
                 alert('Stakeholder wajib dipilih untuk survei SROI.');
@@ -282,7 +287,8 @@ export default function EditSurvey({
             if (
                 requiredQuestions.length === 0 ||
                 requiredQuestions.some(
-                    (question) => !String(sroiAnswers[question.id] ?? '').trim(),
+                    (question) =>
+                        !String(sroiAnswers[question.id] ?? '').trim(),
                 )
             ) {
                 alert('Semua pertanyaan SROI harus dijawab sebelum menyimpan.');
@@ -397,10 +403,12 @@ export default function EditSurvey({
                 <RespondentForm
                     data={respondentData}
                     isSroi={isSroi}
-                    stakeholderOptions={projectStakeholders.map((stakeholder) => ({
-                        value: String(stakeholder.id),
-                        label: stakeholder.name,
-                    }))}
+                    stakeholderOptions={projectStakeholders.map(
+                        (stakeholder) => ({
+                            value: String(stakeholder.id),
+                            label: stakeholder.name,
+                        }),
+                    )}
                     onChange={setRespondentData}
                     onBack={handleBack}
                     onNext={() => goToStep(2)}

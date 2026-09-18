@@ -1,8 +1,14 @@
+import { ReactNode } from 'react';
 import MaterialIcon from './Icons/MaterialIcon';
 import Badge from './UI/Badge';
 import Button from './UI/Button';
 
-export type ProjectStatus = 'active' | 'upcoming' | 'finished';
+export type ProjectStatus =
+    | 'active'
+    | 'upcoming'
+    | 'finished'
+    | 'closed'
+    | 'archived';
 export type ProjectType = 'IKM' | 'SLOI' | 'SROI';
 
 export interface ProjectData {
@@ -22,6 +28,8 @@ interface ProjectCardProps {
     project: ProjectData;
     onStartSurvey?: (project: ProjectData) => void;
     onViewReport?: (project: ProjectData) => void;
+    showActions?: boolean;
+    actions?: ReactNode;
 }
 
 const typeVariants: Record<ProjectType, 'blue' | 'purple' | 'amber'> = {
@@ -41,12 +49,16 @@ const statusConfig: Record<
         icon: 'event_upcoming',
     },
     finished: { label: 'Selesai', variant: 'gray', icon: 'event_available' },
+    closed: { label: 'Selesai', variant: 'gray', icon: 'event_available' },
+    archived: { label: 'Diarsipkan', variant: 'gray', icon: 'archive' },
 };
 
 export default function ProjectCard({
     project,
     onStartSurvey,
     onViewReport,
+    showActions = true,
+    actions,
 }: ProjectCardProps) {
     const statusInfo = statusConfig[project.status];
 
@@ -91,6 +103,8 @@ export default function ProjectCard({
                     </Button>
                 );
             case 'finished':
+            case 'closed':
+            case 'archived':
                 return (
                     <Button
                         variant="outline"
@@ -111,6 +125,8 @@ export default function ProjectCard({
             case 'upcoming':
                 return 'text-amber-500';
             case 'finished':
+            case 'closed':
+            case 'archived':
                 return 'text-gray-400';
         }
     };
@@ -164,8 +180,11 @@ export default function ProjectCard({
                 </div>
             </div>
 
-            {/* Action Button */}
-            <div className="p-5 pt-0">{renderButton()}</div>
+            {actions !== undefined ? (
+                <div className="p-5 pt-0">{actions}</div>
+            ) : (
+                showActions && <div className="p-5 pt-0">{renderButton()}</div>
+            )}
         </article>
     );
 }

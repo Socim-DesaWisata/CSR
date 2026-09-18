@@ -124,11 +124,14 @@ export default function QuestionForm({
         const isComplete = Object.keys(sroiAnswers).length === totalRequired;
 
         const questionsByParent = (questions: SroiQuestion[]) =>
-            questions.reduce<Map<number | null, SroiQuestion[]>>((map, question) => {
-                const key = question.parentQuestionId ?? null;
-                map.set(key, [...(map.get(key) ?? []), question]);
-                return map;
-            }, new Map());
+            questions.reduce<Map<number | null, SroiQuestion[]>>(
+                (map, question) => {
+                    const key = question.parentQuestionId ?? null;
+                    map.set(key, [...(map.get(key) ?? []), question]);
+                    return map;
+                },
+                new Map(),
+            );
 
         const renderQuestionTree = (
             question: SroiQuestion,
@@ -136,7 +139,8 @@ export default function QuestionForm({
             depth = 0,
         ): React.ReactNode => {
             const children = map.get(question.id) ?? [];
-            const paddingClass = depth === 0 ? 'pl-0' : depth === 1 ? 'pl-4' : 'pl-8';
+            const paddingClass =
+                depth === 0 ? 'pl-0' : depth === 1 ? 'pl-4' : 'pl-8';
             const answerId = question.id;
 
             return (
@@ -189,9 +193,12 @@ export default function QuestionForm({
                             {children
                                 .sort(
                                     (left, right) =>
-                                        left.orderNo - right.orderNo || left.id - right.id,
+                                        left.orderNo - right.orderNo ||
+                                        left.id - right.id,
                                 )
-                                .map((child) => renderQuestionTree(child, map, depth + 1))}
+                                .map((child) =>
+                                    renderQuestionTree(child, map, depth + 1),
+                                )}
                         </div>
                     )}
                 </div>
@@ -216,15 +223,24 @@ export default function QuestionForm({
                         const roots = map.get(null) ?? [];
 
                         return (
-                            <div key={section.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <div
+                                key={section.id}
+                                className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                            >
                                 <div className="mb-3">
-                                    <h3 className="text-base font-bold text-slate-900">{section.title}</h3>
+                                    <h3 className="text-base font-bold text-slate-900">
+                                        {section.title}
+                                    </h3>
                                     {section.description && (
-                                        <p className="mt-1 text-sm text-slate-600">{section.description}</p>
+                                        <p className="mt-1 text-sm text-slate-600">
+                                            {section.description}
+                                        </p>
                                     )}
                                 </div>
                                 <div className="space-y-4">
-                                    {roots.map((question) => renderQuestionTree(question, map))}
+                                    {roots.map((question) =>
+                                        renderQuestionTree(question, map),
+                                    )}
                                 </div>
                             </div>
                         );
@@ -248,7 +264,7 @@ export default function QuestionForm({
             (acc, q) =>
                 acc +
                 (q.category === 'ikm-kepentingan' ||
-                    q.category === 'ikm-kinerja'
+                q.category === 'ikm-kinerja'
                     ? 1
                     : 2),
             0,
@@ -391,18 +407,18 @@ export default function QuestionForm({
                                 >
                                     {Object.keys(groupedQuestions).length >
                                         1 && (
-                                            <div className="flex items-center gap-2">
-                                                <div className="h-px flex-1 bg-gray-200" />
-                                                <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                                    {category === 'ikm-kepentingan'
-                                                        ? 'IKM Kepentingan'
-                                                        : category === 'ikm-kinerja'
-                                                            ? 'IKM Kinerja'
-                                                            : category}
-                                                </span>
-                                                <div className="h-px flex-1 bg-gray-200" />
-                                            </div>
-                                        )}
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-px flex-1 bg-gray-200" />
+                                            <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                                {category === 'ikm-kepentingan'
+                                                    ? 'IKM Kepentingan'
+                                                    : category === 'ikm-kinerja'
+                                                      ? 'IKM Kinerja'
+                                                      : category}
+                                            </span>
+                                            <div className="h-px flex-1 bg-gray-200" />
+                                        </div>
+                                    )}
 
                                     {catQuestions.map((question) => {
                                         if (isIKM) {
@@ -440,24 +456,24 @@ export default function QuestionForm({
                                                                 minLabel={
                                                                     isKepentingan
                                                                         ? IKM_LABELS
-                                                                            .kepentingan
-                                                                            .min
+                                                                              .kepentingan
+                                                                              .min
                                                                         : IKM_LABELS
-                                                                            .kinerja
-                                                                            .min
+                                                                              .kinerja
+                                                                              .min
                                                                 }
                                                                 maxLabel={
                                                                     isKepentingan
                                                                         ? IKM_LABELS
-                                                                            .kepentingan
-                                                                            .max
+                                                                              .kepentingan
+                                                                              .max
                                                                         : IKM_LABELS
-                                                                            .kinerja
-                                                                            .max
+                                                                              .kinerja
+                                                                              .max
                                                                 }
                                                                 isAnswered={
                                                                     answers[
-                                                                    key
+                                                                        key
                                                                     ] !==
                                                                     undefined
                                                                 }
@@ -495,7 +511,7 @@ export default function QuestionForm({
                                                                 name={kepKey}
                                                                 value={
                                                                     answers[
-                                                                    kepKey
+                                                                        kepKey
                                                                     ]
                                                                 }
                                                                 onChange={(v) =>
@@ -517,7 +533,7 @@ export default function QuestionForm({
                                                                 }
                                                                 isAnswered={
                                                                     answers[
-                                                                    kepKey
+                                                                        kepKey
                                                                     ] !==
                                                                     undefined
                                                                 }
@@ -544,7 +560,7 @@ export default function QuestionForm({
                                                                 name={kinKey}
                                                                 value={
                                                                     answers[
-                                                                    kinKey
+                                                                        kinKey
                                                                     ]
                                                                 }
                                                                 onChange={(v) =>
@@ -566,7 +582,7 @@ export default function QuestionForm({
                                                                 }
                                                                 isAnswered={
                                                                     answers[
-                                                                    kinKey
+                                                                        kinKey
                                                                     ] !==
                                                                     undefined
                                                                 }

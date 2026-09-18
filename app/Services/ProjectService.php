@@ -90,6 +90,19 @@ class ProjectService
         return $this->buildProjectListQuery($query, $params);
     }
 
+    public function getSroiProjectsByEnumerator(int $enumeratorId, array $params = []): LengthAwarePaginator
+    {
+        $assignedProjectIds = ProjectEnumeratorAssignment::where('enumerator_id', $enumeratorId)
+            ->pluck('project_id');
+
+        $query = Project::query()
+            ->whereIn('id', $assignedProjectIds)
+            ->where('status', '!=', 'draft')
+            ->where('enable_sroi', true);
+
+        return $this->buildProjectListQuery($query, $params);
+    }
+
     public function getProjectSummary(int $companyId): array
     {
         $projects = Project::where('company_id', $companyId)->get();

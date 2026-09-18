@@ -26,10 +26,13 @@ interface Props {
     answers?: SroiAnswerMap;
 }
 
-export default function SROIFormTable({ sections, answers = {} }: Props): ReactNode {
+export default function SROIFormTable({
+    sections,
+    answers = {},
+}: Props): ReactNode {
     return (
         <div className="overflow-hidden border border-slate-500 bg-white shadow-sm">
-            <table className="w-full border-collapse table-fixed">
+            <table className="w-full table-fixed border-collapse">
                 <thead>
                     <tr className="bg-blue-100 text-slate-950">
                         <th className="w-[32%] border border-slate-500 px-3 py-2 text-left text-sm font-bold">
@@ -42,7 +45,11 @@ export default function SROIFormTable({ sections, answers = {} }: Props): ReactN
                 </thead>
                 <tbody>
                     {sections.map((section) => (
-                        <SectionRows key={section.id} section={section} answers={answers} />
+                        <SectionRows
+                            key={section.id}
+                            section={section}
+                            answers={answers}
+                        />
                     ))}
                 </tbody>
             </table>
@@ -50,9 +57,19 @@ export default function SROIFormTable({ sections, answers = {} }: Props): ReactN
     );
 }
 
-function SectionRows({ section, answers }: { section: SroiSectionView; answers: SroiAnswerMap }): ReactNode {
-    const orderedQuestions = [...section.questions].sort((left, right) => left.orderNo - right.orderNo || left.id - right.id);
-    const questionsByParent = orderedQuestions.reduce<Map<number | null, SroiQuestionView[]>>((map, question) => {
+function SectionRows({
+    section,
+    answers,
+}: {
+    section: SroiSectionView;
+    answers: SroiAnswerMap;
+}): ReactNode {
+    const orderedQuestions = [...section.questions].sort(
+        (left, right) => left.orderNo - right.orderNo || left.id - right.id,
+    );
+    const questionsByParent = orderedQuestions.reduce<
+        Map<number | null, SroiQuestionView[]>
+    >((map, question) => {
         const key = question.parentQuestionId ?? null;
         map.set(key, [...(map.get(key) ?? []), question]);
         return map;
@@ -62,19 +79,30 @@ function SectionRows({ section, answers }: { section: SroiSectionView; answers: 
     return (
         <>
             <tr className="bg-slate-100">
-                <td colSpan={2} className="border border-slate-500 px-3 py-3 text-center text-base font-bold text-slate-900">
+                <td
+                    colSpan={2}
+                    className="border border-slate-500 px-3 py-3 text-center text-base font-bold text-slate-900"
+                >
                     {section.title}
                 </td>
             </tr>
             {section.description && (
                 <tr>
-                    <td colSpan={2} className="border border-slate-500 px-3 py-2 text-sm text-slate-600">
+                    <td
+                        colSpan={2}
+                        className="border border-slate-500 px-3 py-2 text-sm text-slate-600"
+                    >
                         {section.description}
                     </td>
                 </tr>
             )}
             {rootQuestions.map((question) => (
-                <QuestionTreeRows key={question.id} question={question} questionsByParent={questionsByParent} answers={answers} />
+                <QuestionTreeRows
+                    key={question.id}
+                    question={question}
+                    questionsByParent={questionsByParent}
+                    answers={answers}
+                />
             ))}
         </>
     );
@@ -95,7 +123,7 @@ function QuestionTreeRows({
         return (
             <tr>
                 <QuestionCell question={question} />
-                <td className="align-top border border-slate-500 px-3 py-3 text-[15px] leading-8 text-slate-900">
+                <td className="border border-slate-500 px-3 py-3 align-top text-[15px] leading-8 text-slate-900">
                     <AnswerContent question={question} answers={answers} />
                 </td>
             </tr>
@@ -112,53 +140,105 @@ function QuestionTreeRows({
             </tr>
             {rightRows.slice(1).map((rowQuestion) => (
                 <tr key={rowQuestion.id}>
-                    <RightQuestionCell question={rowQuestion} answers={answers} />
+                    <RightQuestionCell
+                        question={rowQuestion}
+                        answers={answers}
+                    />
                 </tr>
             ))}
         </>
     );
 }
 
-function flattenRightRows(children: SroiQuestionView[], questionsByParent: Map<number | null, SroiQuestionView[]>): SroiQuestionView[] {
-    return children.flatMap((child) => [child, ...flattenRightRows(questionsByParent.get(child.id) ?? [], questionsByParent)]);
+function flattenRightRows(
+    children: SroiQuestionView[],
+    questionsByParent: Map<number | null, SroiQuestionView[]>,
+): SroiQuestionView[] {
+    return children.flatMap((child) => [
+        child,
+        ...flattenRightRows(
+            questionsByParent.get(child.id) ?? [],
+            questionsByParent,
+        ),
+    ]);
 }
 
-function QuestionCell({ question, rowSpan }: { question: SroiQuestionView; rowSpan?: number }): ReactNode {
+function QuestionCell({
+    question,
+    rowSpan,
+}: {
+    question: SroiQuestionView;
+    rowSpan?: number;
+}): ReactNode {
     return (
-        <td rowSpan={rowSpan} className="w-[32%] align-middle border border-slate-500 px-3 py-3 text-[15px] leading-8 text-slate-900">
+        <td
+            rowSpan={rowSpan}
+            className="w-[32%] border border-slate-500 px-3 py-3 align-middle text-[15px] leading-8 text-slate-900"
+        >
             <QuestionText question={question} />
         </td>
     );
 }
 
-function RightQuestionCell({ question, answers }: { question: SroiQuestionView; answers: SroiAnswerMap }): ReactNode {
+function RightQuestionCell({
+    question,
+    answers,
+}: {
+    question: SroiQuestionView;
+    answers: SroiAnswerMap;
+}): ReactNode {
     return (
-        <td className="align-top border border-slate-500 px-3 py-3 text-[15px] leading-8 text-slate-900">
-            <QuestionText question={question} strong={question.isGroup || question.answerType === null} />
+        <td className="border border-slate-500 px-3 py-3 align-top text-[15px] leading-8 text-slate-900">
+            <QuestionText
+                question={question}
+                strong={question.isGroup || question.answerType === null}
+            />
             <AnswerContent question={question} answers={answers} />
         </td>
     );
 }
 
-function QuestionText({ question, strong = false }: { question: SroiQuestionView; strong?: boolean }): ReactNode {
+function QuestionText({
+    question,
+    strong = false,
+}: {
+    question: SroiQuestionView;
+    strong?: boolean;
+}): ReactNode {
     return (
         <div className={strong ? 'font-bold text-slate-900' : 'text-slate-900'}>
             {question.questionText}
-            {question.helpText && <p className="mt-1 text-sm font-normal leading-6 text-slate-600">{question.helpText}</p>}
+            {question.helpText && (
+                <p className="mt-1 text-sm font-normal leading-6 text-slate-600">
+                    {question.helpText}
+                </p>
+            )}
         </div>
     );
 }
 
-function AnswerContent({ question, answers }: { question: SroiQuestionView; answers: SroiAnswerMap }): ReactNode {
+function AnswerContent({
+    question,
+    answers,
+}: {
+    question: SroiQuestionView;
+    answers: SroiAnswerMap;
+}): ReactNode {
     if (question.isGroup || question.answerType === null) {
         return null;
     }
 
     if (Object.prototype.hasOwnProperty.call(answers, question.id)) {
-        return <p className="mt-2 font-semibold text-slate-950">{answers[question.id] ?? '-'}</p>;
+        return (
+            <p className="mt-2 font-semibold text-slate-950">
+                {answers[question.id] ?? '-'}
+            </p>
+        );
     }
 
-    return question.answerType === 'number' ? null : <BlankTextLines lines={2} />;
+    return question.answerType === 'number' ? null : (
+        <BlankTextLines lines={2} />
+    );
 }
 
 function BlankTextLines({ lines }: { lines: number }): ReactNode {

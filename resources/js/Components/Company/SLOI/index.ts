@@ -1,7 +1,7 @@
 // SLOI Components Index
 export { default as SLOIAgeRangeChart } from './SLOIAgeRangeChart';
-export { default as SLOIAuditLog } from './SLOIAuditLog';
 export { default as SLOIAspectTable } from './SLOIAspectTable';
+export { default as SLOIAuditLog } from './SLOIAuditLog';
 export { default as SLOIEducationChart } from './SLOIEducationChart';
 export { default as SLOIGenderPieChart } from './SLOIGenderPieChart';
 export { default as SLOIHeader } from './SLOIHeader';

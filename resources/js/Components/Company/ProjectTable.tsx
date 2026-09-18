@@ -163,25 +163,31 @@ export default function ProjectTable({
 
                         {/* IKM Progress */}
                         <div>
-                            {project.ikmTargetResponses !== undefined && project.ikmTargetResponses > 0 ? (
+                            {project.ikmTargetResponses !== undefined &&
+                            project.ikmTargetResponses > 0 ? (
                                 <ProgressBar
                                     current={project.ikmCurrentResponses || 0}
                                     total={project.ikmTargetResponses}
                                 />
                             ) : (
-                                <div className="text-center text-sm text-slate-400">-</div>
+                                <div className="text-center text-sm text-slate-400">
+                                    -
+                                </div>
                             )}
                         </div>
 
                         {/* SLOI Progress */}
                         <div>
-                            {project.sloiTargetResponses !== undefined && project.sloiTargetResponses > 0 ? (
+                            {project.sloiTargetResponses !== undefined &&
+                            project.sloiTargetResponses > 0 ? (
                                 <ProgressBar
                                     current={project.sloiCurrentResponses || 0}
                                     total={project.sloiTargetResponses}
                                 />
                             ) : (
-                                <div className="text-center text-sm text-slate-400">-</div>
+                                <div className="text-center text-sm text-slate-400">
+                                    -
+                                </div>
                             )}
                         </div>
 

@@ -192,7 +192,10 @@ export default function ReviewForm({
 
                         <div className="space-y-3">
                             {section.questions.map((question) => {
-                                if (question.isGroup || question.answerType === null) {
+                                if (
+                                    question.isGroup ||
+                                    question.answerType === null
+                                ) {
                                     return (
                                         <div
                                             key={question.id}
@@ -218,7 +221,8 @@ export default function ReviewForm({
                                         )}
                                         <div className="mt-3 rounded-md bg-primary/5 px-3 py-2 text-sm text-slate-700">
                                             {sroiAnswers[question.id] || '-'}
-                                            {question.answerType === 'number' && question.unit
+                                            {question.answerType === 'number' &&
+                                            question.unit
                                                 ? ` ${question.unit}`
                                                 : ''}
                                         </div>
@@ -318,105 +322,108 @@ export default function ReviewForm({
 
                 {/* Jawaban Kuesioner */}
                 <ReviewSection title="Jawaban Kuesioner" icon="quiz">
-                    {isSroi ? renderSroiReview() : (
-                    <div className="overflow-x-auto rounded-lg border border-gray-200">
-                        <table className="w-full text-left text-sm text-gray-600">
-                            <thead className="bg-gray-50 text-xs uppercase text-gray-500">
-                                <tr>
-                                    <th className="px-4 py-3 font-semibold">
-                                        Kode
-                                    </th>
-                                    {/* <th className="px-4 py-3 font-semibold">
+                    {isSroi ? (
+                        renderSroiReview()
+                    ) : (
+                        <div className="overflow-x-auto rounded-lg border border-gray-200">
+                            <table className="w-full text-left text-sm text-gray-600">
+                                <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+                                    <tr>
+                                        <th className="px-4 py-3 font-semibold">
+                                            Kode
+                                        </th>
+                                        {/* <th className="px-4 py-3 font-semibold">
                                         Tipe
                                     </th> */}
-                                    <th className="px-4 py-3 font-semibold">
-                                        Pertanyaan
-                                    </th>
-                                    <th className="px-4 py-3 text-center font-semibold">
-                                        Nilai
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200 bg-white">
-                                {Object.entries(answers).length > 0 ? (
-                                    Object.entries(answers)
-                                        .sort(([keyA], [keyB]) => {
-                                            const qIdA = Number(
-                                                keyA.substring(
-                                                    0,
-                                                    keyA.indexOf('-'),
-                                                ),
-                                            );
-                                            const qIdB = Number(
-                                                keyB.substring(
-                                                    0,
-                                                    keyB.indexOf('-'),
-                                                ),
-                                            );
-                                            const orderA =
-                                                questionMap.get(qIdA)
-                                                    ?.order_no ?? qIdA;
-                                            const orderB =
-                                                questionMap.get(qIdB)
-                                                    ?.order_no ?? qIdB;
-                                            if (orderA !== orderB)
-                                                return orderA - orderB;
-                                            return keyA.localeCompare(keyB);
-                                        })
-                                        .map(([key, value]) => {
-                                            const dashIdx = key.indexOf('-');
-                                            const qId = Number(
-                                                key.substring(0, dashIdx),
-                                            );
-                                            const type = key.substring(
-                                                dashIdx + 1,
-                                            );
-                                            const question =
-                                                questionMap.get(qId);
+                                        <th className="px-4 py-3 font-semibold">
+                                            Pertanyaan
+                                        </th>
+                                        <th className="px-4 py-3 text-center font-semibold">
+                                            Nilai
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 bg-white">
+                                    {Object.entries(answers).length > 0 ? (
+                                        Object.entries(answers)
+                                            .sort(([keyA], [keyB]) => {
+                                                const qIdA = Number(
+                                                    keyA.substring(
+                                                        0,
+                                                        keyA.indexOf('-'),
+                                                    ),
+                                                );
+                                                const qIdB = Number(
+                                                    keyB.substring(
+                                                        0,
+                                                        keyB.indexOf('-'),
+                                                    ),
+                                                );
+                                                const orderA =
+                                                    questionMap.get(qIdA)
+                                                        ?.order_no ?? qIdA;
+                                                const orderB =
+                                                    questionMap.get(qIdB)
+                                                        ?.order_no ?? qIdB;
+                                                if (orderA !== orderB)
+                                                    return orderA - orderB;
+                                                return keyA.localeCompare(keyB);
+                                            })
+                                            .map(([key, value]) => {
+                                                const dashIdx =
+                                                    key.indexOf('-');
+                                                const qId = Number(
+                                                    key.substring(0, dashIdx),
+                                                );
+                                                const type = key.substring(
+                                                    dashIdx + 1,
+                                                );
+                                                const question =
+                                                    questionMap.get(qId);
 
-                                            return (
-                                                <tr
-                                                    key={key}
-                                                    className="transition-colors hover:bg-gray-50"
-                                                >
-                                                    <td className="whitespace-nowrap border-r border-gray-100 px-4 py-3 font-medium text-gray-900">
-                                                        {question?.code ??
-                                                            `Q${qId}`}
-                                                    </td>
-                                                    {/* <td className="whitespace-nowrap border-r border-gray-100 px-4 py-3">
+                                                return (
+                                                    <tr
+                                                        key={key}
+                                                        className="transition-colors hover:bg-gray-50"
+                                                    >
+                                                        <td className="whitespace-nowrap border-r border-gray-100 px-4 py-3 font-medium text-gray-900">
+                                                            {question?.code ??
+                                                                `Q${qId}`}
+                                                        </td>
+                                                        {/* <td className="whitespace-nowrap border-r border-gray-100 px-4 py-3">
                                                         <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
                                                             {typeLabel(type)}
                                                         </span>
                                                     </td> */}
-                                                    <td
-                                                        className="min-w-[200px] border-r border-gray-100 px-4 py-3"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html:
-                                                                question?.question_text ??
-                                                                '-',
-                                                        }}
-                                                    />
-                                                    <td className="whitespace-nowrap px-4 py-3 text-center">
-                                                        <span className="inline-flex items-center justify-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
-                                                            {value}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })
-                                ) : (
-                                    <tr>
-                                        <td
-                                            colSpan={4}
-                                            className="px-4 py-6 text-center text-gray-500"
-                                        >
-                                            Belum ada jawaban
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                                        <td
+                                                            className="min-w-[200px] border-r border-gray-100 px-4 py-3"
+                                                            dangerouslySetInnerHTML={{
+                                                                __html:
+                                                                    question?.question_text ??
+                                                                    '-',
+                                                            }}
+                                                        />
+                                                        <td className="whitespace-nowrap px-4 py-3 text-center">
+                                                            <span className="inline-flex items-center justify-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+                                                                {value}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
+                                    ) : (
+                                        <tr>
+                                            <td
+                                                colSpan={4}
+                                                className="px-4 py-6 text-center text-gray-500"
+                                            >
+                                                Belum ada jawaban
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </ReviewSection>
 

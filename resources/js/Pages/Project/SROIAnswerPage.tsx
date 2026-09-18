@@ -1,8 +1,17 @@
+import SROIFormTable, {
+    SroiSectionView,
+} from '@/Components/Company/SROI/SROIFormTable';
 import CompanyLayout from '@/Layouts/AppLayout';
 import { Head, router } from '@inertiajs/react';
-import { ArrowLeft, Building2, CalendarDays, FileText, Hash, UserRound } from 'lucide-react';
+import {
+    ArrowLeft,
+    Building2,
+    CalendarDays,
+    FileText,
+    Hash,
+    UserRound,
+} from 'lucide-react';
 import { ReactNode } from 'react';
-import SROIFormTable, { SroiSectionView } from '@/Components/Company/SROI/SROIFormTable';
 
 interface ProjectPreview {
     id: number;
@@ -36,13 +45,26 @@ interface Props {
     answers: Record<number, string | number | null>;
 }
 
-export default function SROIAnswerPage({ project, form, submission, sections, answers }: Props): ReactNode {
+export default function SROIAnswerPage({
+    project,
+    form,
+    submission,
+    sections,
+    answers,
+}: Props): ReactNode {
     const backToList = () => {
-        router.visit(route('projects.show', { id: project.id, detailType: 'sroi_respondent' }));
+        router.visit(
+            route('projects.show', {
+                id: project.id,
+                detailType: 'sroi_respondent',
+            }),
+        );
     };
 
     return (
-        <CompanyLayout breadcrumb={{ parent: 'Proyek', current: 'Jawaban SROI' }}>
+        <CompanyLayout
+            breadcrumb={{ parent: 'Proyek', current: 'Jawaban SROI' }}
+        >
             <Head title={`Jawaban SROI - ${project.name}`} />
 
             <div className="min-h-screen bg-slate-100 px-3 py-4 sm:px-6 lg:px-8">
@@ -63,19 +85,53 @@ export default function SROIAnswerPage({ project, form, submission, sections, an
 
                     <div className="border border-slate-400 bg-white">
                         <div className="border-b border-slate-300 bg-slate-50 px-4 py-3">
-                            <h1 className="text-base font-bold text-slate-900">{form.name}</h1>
-                            {form.description && <p className="mt-1 text-sm text-slate-600">{form.description}</p>}
+                            <h1 className="text-base font-bold text-slate-900">
+                                {form.name}
+                            </h1>
+                            {form.description && (
+                                <p className="mt-1 text-sm text-slate-600">
+                                    {form.description}
+                                </p>
+                            )}
                         </div>
                         <div className="grid gap-0 md:grid-cols-3">
-                            <InfoCard label="Perusahaan" value={project.companyName || '-'} icon={<Building2 className="size-4" />} />
-                            <InfoCard label="Project" value={project.name} icon={<FileText className="size-4" />} />
-                            <InfoCard label="Kode Project" value={project.projectCode} icon={<Hash className="size-4" />} />
+                            <InfoCard
+                                label="Perusahaan"
+                                value={project.companyName || '-'}
+                                icon={<Building2 className="size-4" />}
+                            />
+                            <InfoCard
+                                label="Project"
+                                value={project.name}
+                                icon={<FileText className="size-4" />}
+                            />
+                            <InfoCard
+                                label="Kode Project"
+                                value={project.projectCode}
+                                icon={<Hash className="size-4" />}
+                            />
                         </div>
                         <div className="grid gap-0 border-t border-slate-300 md:grid-cols-2">
-                            <InfoCard label="Respondent" value={submission.respondentName || '-'} icon={<UserRound className="size-4" />} />
-                            <InfoCard label="Stakeholder" value={submission.stakeholderName || '-'} icon={<Building2 className="size-4" />} />
-                            <InfoCard label="Enumerator" value={submission.enumeratorName || '-'} icon={<UserRound className="size-4" />} />
-                            <InfoCard label="Tanggal" value={submission.submittedAt || '-'} icon={<CalendarDays className="size-4" />} />
+                            <InfoCard
+                                label="Respondent"
+                                value={submission.respondentName || '-'}
+                                icon={<UserRound className="size-4" />}
+                            />
+                            <InfoCard
+                                label="Stakeholder"
+                                value={submission.stakeholderName || '-'}
+                                icon={<Building2 className="size-4" />}
+                            />
+                            <InfoCard
+                                label="Enumerator"
+                                value={submission.enumeratorName || '-'}
+                                icon={<UserRound className="size-4" />}
+                            />
+                            <InfoCard
+                                label="Tanggal"
+                                value={submission.submittedAt || '-'}
+                                icon={<CalendarDays className="size-4" />}
+                            />
                         </div>
                     </div>
 
@@ -86,14 +142,26 @@ export default function SROIAnswerPage({ project, form, submission, sections, an
     );
 }
 
-function InfoCard({ label, value, icon }: { label: string; value: string; icon: ReactNode }): ReactNode {
+function InfoCard({
+    label,
+    value,
+    icon,
+}: {
+    label: string;
+    value: string;
+    icon: ReactNode;
+}): ReactNode {
     return (
         <div className="border-r border-slate-300 px-4 py-3 last:border-r-0 md:last:border-r-0">
             <div className="flex items-start gap-3">
                 <div className="mt-0.5 text-slate-500">{icon}</div>
                 <div className="min-w-0">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-                    <p className="text-sm font-medium text-slate-900">{value}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                        {label}
+                    </p>
+                    <p className="text-sm font-medium text-slate-900">
+                        {value}
+                    </p>
                 </div>
             </div>
         </div>

@@ -127,10 +127,16 @@ export default function Sidebar({
                         className={`absolute top-3 flex size-7 items-center justify-center rounded-md bg-white/10 transition-colors hover:bg-white/20 ${
                             collapsed ? 'right-1.5' : 'right-4'
                         }`}
-                        aria-label={collapsed ? 'Buka sidebar' : 'Tutup sidebar'}
+                        aria-label={
+                            collapsed ? 'Buka sidebar' : 'Tutup sidebar'
+                        }
                         title={collapsed ? 'Buka sidebar' : 'Tutup sidebar'}
                     >
-                        {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+                        {collapsed ? (
+                            <ChevronRight className="size-4" />
+                        ) : (
+                            <ChevronLeft className="size-4" />
+                        )}
                     </button>
                 )}
             </div>
@@ -145,10 +151,14 @@ export default function Sidebar({
                         const userRole = user.role.toLowerCase();
                         const isAllowedByRoles =
                             !item.roles ||
-                            item.roles.map((r) => r.toLowerCase()).includes(userRole);
+                            item.roles
+                                .map((r) => r.toLowerCase())
+                                .includes(userRole);
                         const isHiddenByRoles =
                             item.hideForRoles &&
-                            item.hideForRoles.map((r) => r.toLowerCase()).includes(userRole);
+                            item.hideForRoles
+                                .map((r) => r.toLowerCase())
+                                .includes(userRole);
                         return isAllowedByRoles && !isHiddenByRoles;
                     })
                     .map((item) => (
@@ -208,7 +218,11 @@ export default function Sidebar({
                 </div>
             )}
 
-            <Modal show={showLogoutModal} onClose={() => setShowLogoutModal(false)} maxWidth="sm">
+            <Modal
+                show={showLogoutModal}
+                onClose={() => setShowLogoutModal(false)}
+                maxWidth="sm"
+            >
                 <div className="p-6">
                     <div className="mb-4 flex items-center justify-center">
                         <div className="flex size-14 items-center justify-center rounded-full bg-red-100 text-red-600">
@@ -219,7 +233,8 @@ export default function Sidebar({
                         Konfirmasi Logout
                     </h3>
                     <p className="mb-6 text-center text-sm text-gray-600">
-                        Apakah Anda yakin ingin keluar dari aplikasi? Anda harus login kembali untuk mengakses sistem.
+                        Apakah Anda yakin ingin keluar dari aplikasi? Anda harus
+                        login kembali untuk mengakses sistem.
                     </p>
                     <div className="flex gap-3">
                         <button

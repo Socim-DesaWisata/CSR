@@ -28,7 +28,10 @@ function formatScore(value: number): string {
     return value.toFixed(2);
 }
 
-function replaceProjectPlaceholder(question: string, projectName: string): string {
+function replaceProjectPlaceholder(
+    question: string,
+    projectName: string,
+): string {
     return question.replaceAll('{project}', `<strong>${projectName}</strong>`);
 }
 
@@ -47,9 +50,7 @@ export default function IKMQuestionTable({
         );
         const ikmQuestions = allQuestions
             .filter((question) =>
-                ['ikm-kepentingan', 'ikm-kinerja'].includes(
-                    question.category,
-                ),
+                ['ikm-kepentingan', 'ikm-kinerja'].includes(question.category),
             )
             .sort((a, b) => a.order_no - b.order_no);
 
@@ -118,8 +119,8 @@ export default function IKMQuestionTable({
                         Tabel Pertanyaan IKM
                     </h3>
                     <p className="mt-2 max-w-sm text-sm text-slate-400">
-                        Belum tersedia. Data pertanyaan akan ditampilkan
-                        setelah survei IKM memiliki jawaban.
+                        Belum tersedia. Data pertanyaan akan ditampilkan setelah
+                        survei IKM memiliki jawaban.
                     </p>
                 </div>
             </div>

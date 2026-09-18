@@ -28,6 +28,8 @@ Route::get('/', function () {
 
 Route::prefix('enumerator')->middleware('auth')->name('enumerator.')->group(function () {
     Route::get('/list', [EnumeratorProjectController::class, 'listProjectPage'])->name('list-survey');
+    Route::get('/sroi', [EnumeratorProjectController::class, 'listSroiPage'])->name('sroi.index');
+    Route::get('/sroi/{project}/data', [EnumeratorProjectController::class, 'dataSroiPage'])->name('sroi.data');
     Route::get('/survey/respondent/{projectId}', [EnumeratorSurveyController::class, 'surveyRespondentPage'])->name('survey.respondent');
     Route::post('/survey/respondent/{projectId}/store', [EnumeratorSurveyController::class, 'storeDataSurvey'])->name('survey.store');
     Route::get('/survey/history', [EnumeratorSurveyController::class, 'historyPage'])->name('survey.history');

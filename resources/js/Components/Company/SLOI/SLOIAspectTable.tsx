@@ -72,8 +72,8 @@ export default function SLOIAspectTable({
                         Pengolahan dan Analisis Data
                     </h3>
                     <p className="mt-2 max-w-sm text-xs text-slate-400">
-                        Belum tersedia. Data aspect akan muncul setelah
-                        survei SLOI memiliki jawaban.
+                        Belum tersedia. Data aspect akan muncul setelah survei
+                        SLOI memiliki jawaban.
                     </p>
                 </div>
             </div>
@@ -120,14 +120,10 @@ export default function SLOIAspectTable({
                         <tr className="bg-slate-100 text-slate-700">
                             {data.aspects.map((aspect) => (
                                 <Fragment key={aspect}>
-                                    <th
-                                        className="border border-slate-200 px-2 py-1.5 text-center font-bold"
-                                    >
+                                    <th className="border border-slate-200 px-2 py-1.5 text-center font-bold">
                                         Jumlah
                                     </th>
-                                    <th
-                                        className="border border-slate-200 px-2 py-1.5 text-center font-bold"
-                                    >
+                                    <th className="border border-slate-200 px-2 py-1.5 text-center font-bold">
                                         %
                                     </th>
                                 </Fragment>
@@ -142,7 +138,10 @@ export default function SLOIAspectTable({
                     </thead>
                     <tbody>
                         {data.rows.map((row) => (
-                            <tr key={row.value} className={getRowClass(row.value)}>
+                            <tr
+                                key={row.value}
+                                className={getRowClass(row.value)}
+                            >
                                 <td className="border border-slate-200 px-3 py-1.5 font-medium text-slate-700">
                                     {row.label}
                                 </td>
@@ -153,15 +152,13 @@ export default function SLOIAspectTable({
                                     };
 
                                     return (
-                                        <Fragment key={`${row.value}-${aspect}`}>
-                                            <td
-                                                className="border border-slate-200 px-2 py-1.5 text-center text-slate-700"
-                                            >
+                                        <Fragment
+                                            key={`${row.value}-${aspect}`}
+                                        >
+                                            <td className="border border-slate-200 px-2 py-1.5 text-center text-slate-700">
                                                 {cell.count}
                                             </td>
-                                            <td
-                                                className="border border-slate-200 px-2 py-1.5 text-center text-slate-700"
-                                            >
+                                            <td className="border border-slate-200 px-2 py-1.5 text-center text-slate-700">
                                                 {formatPercentage(
                                                     cell.percentage,
                                                 )}
@@ -189,17 +186,11 @@ export default function SLOIAspectTable({
 
                                 return (
                                     <Fragment key={`${aspect}-total`}>
-                                        <td
-                                            className="border border-slate-200 px-2 py-1.5 text-center"
-                                        >
+                                        <td className="border border-slate-200 px-2 py-1.5 text-center">
                                             {total.count}
                                         </td>
-                                        <td
-                                            className="border border-slate-200 px-2 py-1.5 text-center"
-                                        >
-                                            {formatPercentage(
-                                                total.percentage,
-                                            )}
+                                        <td className="border border-slate-200 px-2 py-1.5 text-center">
+                                            {formatPercentage(total.percentage)}
                                         </td>
                                     </Fragment>
                                 );
@@ -221,8 +212,8 @@ export default function SLOIAspectTable({
                     <span className="font-bold text-slate-900">
                         {formatPercentage(data.summary.positivePercentage)}
                     </span>{' '}
-                    masyarakat menunjukkan dukungan positif terhadap
-                    perusahaan, sedangkan masih ada{' '}
+                    masyarakat menunjukkan dukungan positif terhadap perusahaan,
+                    sedangkan masih ada{' '}
                     <span className="font-bold text-slate-900">
                         {formatPercentage(data.summary.doubtPercentage)}
                     </span>{' '}

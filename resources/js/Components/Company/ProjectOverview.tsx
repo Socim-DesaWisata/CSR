@@ -187,7 +187,9 @@ export default function ProjectOverview({
         if (method === 'delete') router.delete(url, options);
     };
 
-    const openStakeholderModal = (stakeholder: StakeholderItem | null = null) => {
+    const openStakeholderModal = (
+        stakeholder: StakeholderItem | null = null,
+    ) => {
         setErrors({});
         setStakeholderName(stakeholder?.name ?? '');
         setStakeholderModal(stakeholder);
@@ -300,11 +302,12 @@ export default function ProjectOverview({
                                 {[1, 2, 3, 4, 5].map((i) => (
                                     <div
                                         key={i}
-                                        className={`h-1.5 flex-1 rounded-full ${i <=
-                                                Math.ceil(effectiveSloiStats.score)
+                                        className={`h-1.5 flex-1 rounded-full ${
+                                            i <=
+                                            Math.ceil(effectiveSloiStats.score)
                                                 ? 'bg-primary'
                                                 : 'bg-slate-200'
-                                            }`}
+                                        }`}
                                     />
                                 ))}
                             </div>
@@ -438,14 +441,19 @@ export default function ProjectOverview({
                                                 {stakeholder.name}
                                             </p>
                                             <p className="mt-1 text-xs text-slate-500">
-                                                {stakeholder.outcomes.length} outcome
+                                                {stakeholder.outcomes.length}{' '}
+                                                outcome
                                             </p>
                                         </div>
                                         {canEdit && (
                                             <div className="flex items-center gap-2">
                                                 <MiniIconButton
                                                     label="Edit stakeholder"
-                                                    onClick={() => openStakeholderModal(stakeholder)}
+                                                    onClick={() =>
+                                                        openStakeholderModal(
+                                                            stakeholder,
+                                                        )
+                                                    }
                                                 >
                                                     <Pencil className="size-4" />
                                                 </MiniIconButton>
@@ -471,54 +479,62 @@ export default function ProjectOverview({
                                                 Belum ada outcome.
                                             </div>
                                         ) : (
-                                            stakeholder.outcomes.map((outcome, index) => (
-                                                <div
-                                                    key={outcome.id}
-                                                    className="flex items-start justify-between gap-4 rounded-lg border border-slate-200 bg-white px-4 py-3"
-                                                >
-                                                    <div className="flex min-w-0 items-start gap-3">
-                                                        <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                                                            {index + 1}
+                                            stakeholder.outcomes.map(
+                                                (outcome, index) => (
+                                                    <div
+                                                        key={outcome.id}
+                                                        className="flex items-start justify-between gap-4 rounded-lg border border-slate-200 bg-white px-4 py-3"
+                                                    >
+                                                        <div className="flex min-w-0 items-start gap-3">
+                                                            <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                                                                {index + 1}
+                                                            </div>
+                                                            <p className="text-sm leading-relaxed text-slate-700">
+                                                                {
+                                                                    outcome.outcome
+                                                                }
+                                                            </p>
                                                         </div>
-                                                        <p className="text-sm leading-relaxed text-slate-700">
-                                                            {outcome.outcome}
-                                                        </p>
+                                                        {canEdit && (
+                                                            <div className="flex items-center gap-2">
+                                                                <MiniIconButton
+                                                                    label="Edit outcome"
+                                                                    onClick={() =>
+                                                                        openOutcomeModal(
+                                                                            stakeholder.id,
+                                                                            outcome,
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Pencil className="size-4" />
+                                                                </MiniIconButton>
+                                                                <MiniIconButton
+                                                                    label="Hapus outcome"
+                                                                    danger
+                                                                    onClick={() =>
+                                                                        submit(
+                                                                            'delete',
+                                                                            `/projects/${project.id}/stakeholder-outcomes/${outcome.id}`,
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Trash2 className="size-4" />
+                                                                </MiniIconButton>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    {canEdit && (
-                                                        <div className="flex items-center gap-2">
-                                                            <MiniIconButton
-                                                                label="Edit outcome"
-                                                                onClick={() =>
-                                                                    openOutcomeModal(
-                                                                        stakeholder.id,
-                                                                        outcome,
-                                                                    )
-                                                                }
-                                                            >
-                                                                <Pencil className="size-4" />
-                                                            </MiniIconButton>
-                                                            <MiniIconButton
-                                                                label="Hapus outcome"
-                                                                danger
-                                                                onClick={() =>
-                                                                    submit(
-                                                                        'delete',
-                                                                        `/projects/${project.id}/stakeholder-outcomes/${outcome.id}`,
-                                                                    )
-                                                                }
-                                                            >
-                                                                <Trash2 className="size-4" />
-                                                            </MiniIconButton>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))
+                                                ),
+                                            )
                                         )}
 
                                         {canEdit && (
                                             <button
                                                 type="button"
-                                                onClick={() => openOutcomeModal(stakeholder.id)}
+                                                onClick={() =>
+                                                    openOutcomeModal(
+                                                        stakeholder.id,
+                                                    )
+                                                }
                                                 className="inline-flex w-fit items-center gap-2 rounded-lg border border-dashed border-primary/30 bg-white px-3 py-2 text-sm font-medium text-primary transition hover:border-primary hover:bg-primary/5"
                                             >
                                                 <Plus className="size-4" />
@@ -548,10 +564,11 @@ export default function ProjectOverview({
                     {assessmentTypes.map((at) => (
                         <div
                             key={at.key}
-                            className={`flex items-center gap-3 rounded-lg border p-4 ${at.enabled
+                            className={`flex items-center gap-3 rounded-lg border p-4 ${
+                                at.enabled
                                     ? 'border-primary/20 bg-primary/5'
                                     : 'border-slate-100 bg-slate-50 opacity-50'
-                                }`}
+                            }`}
                         >
                             <div
                                 className={`flex size-10 items-center justify-center rounded-lg ${at.bg}`}
@@ -811,7 +828,11 @@ export default function ProjectOverview({
 
             {stakeholderModal !== false && (
                 <SimpleModal
-                    title={stakeholderModal ? 'Edit Stakeholder' : 'Tambah Stakeholder'}
+                    title={
+                        stakeholderModal
+                            ? 'Edit Stakeholder'
+                            : 'Tambah Stakeholder'
+                    }
                     onClose={() => setStakeholderModal(false)}
                 >
                     <div className="space-y-4">
@@ -822,10 +843,14 @@ export default function ProjectOverview({
                             <input
                                 type="text"
                                 value={stakeholderName}
-                                onChange={(event) => setStakeholderName(event.target.value)}
+                                onChange={(event) =>
+                                    setStakeholderName(event.target.value)
+                                }
                                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                             />
-                            {errors.name && <ErrorText>{errors.name}</ErrorText>}
+                            {errors.name && (
+                                <ErrorText>{errors.name}</ErrorText>
+                            )}
                         </label>
                         <div className="flex justify-end gap-3">
                             <button
@@ -850,7 +875,9 @@ export default function ProjectOverview({
 
             {outcomeModal && (
                 <SimpleModal
-                    title={outcomeModal.outcome ? 'Edit Outcome' : 'Tambah Outcome'}
+                    title={
+                        outcomeModal.outcome ? 'Edit Outcome' : 'Tambah Outcome'
+                    }
                     onClose={() => setOutcomeModal(null)}
                 >
                     <div className="space-y-4">
@@ -860,11 +887,15 @@ export default function ProjectOverview({
                             </span>
                             <textarea
                                 value={outcomeText}
-                                onChange={(event) => setOutcomeText(event.target.value)}
+                                onChange={(event) =>
+                                    setOutcomeText(event.target.value)
+                                }
                                 rows={4}
                                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                             />
-                            {errors.outcome && <ErrorText>{errors.outcome}</ErrorText>}
+                            {errors.outcome && (
+                                <ErrorText>{errors.outcome}</ErrorText>
+                            )}
                         </label>
                         <div className="flex justify-end gap-3">
                             <button
@@ -951,7 +982,9 @@ function SimpleModal({
             />
             <div className="relative z-10 w-full max-w-lg rounded-2xl bg-white shadow-xl">
                 <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-                    <h3 className="text-base font-bold text-slate-900">{title}</h3>
+                    <h3 className="text-base font-bold text-slate-900">
+                        {title}
+                    </h3>
                     <button
                         type="button"
                         onClick={onClose}
@@ -967,5 +1000,7 @@ function SimpleModal({
 }
 
 function ErrorText({ children }: { children: ReactNode }): ReactNode {
-    return <p className="mt-1 text-xs font-semibold text-red-600">{children}</p>;
+    return (
+        <p className="mt-1 text-xs font-semibold text-red-600">{children}</p>
+    );
 }

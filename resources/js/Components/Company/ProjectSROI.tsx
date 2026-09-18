@@ -531,9 +531,7 @@ export default function ProjectSROI({
                                 onEditSection={openEditSectionModal}
                                 onOpenInlineQuestion={openInlineQuestionForm}
                                 onQuestionFormChange={setQuestionForm}
-                                onSaveInlineQuestion={() =>
-                                    saveQuestion(false)
-                                }
+                                onSaveInlineQuestion={() => saveQuestion(false)}
                             />
                         ))}
                     </div>
@@ -610,7 +608,9 @@ function SectionCard({
                         <h4 className="font-black text-slate-900">
                             {section.orderNo}. {section.title}
                         </h4>
-                        <SourcePill isTemplate={!!section.sourceTemplateSectionId} />
+                        <SourcePill
+                            isTemplate={!!section.sourceTemplateSectionId}
+                        />
                     </div>
                     {section.description && (
                         <p className="mt-1 text-sm text-slate-500">
@@ -692,7 +692,9 @@ function SectionCard({
                                     </IconButton>
                                     <IconButton
                                         label="Hapus pertanyaan"
-                                        onClick={() => onDeleteQuestion(question)}
+                                        onClick={() =>
+                                            onDeleteQuestion(question)
+                                        }
                                         danger
                                     >
                                         <Trash2 className="size-4" />
@@ -1301,5 +1303,7 @@ function Check({
 }
 
 function ErrorText({ children }: { children: ReactNode }): ReactNode {
-    return <p className="mt-1 text-xs font-semibold text-red-600">{children}</p>;
+    return (
+        <p className="mt-1 text-xs font-semibold text-red-600">{children}</p>
+    );
 }

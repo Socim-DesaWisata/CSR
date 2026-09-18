@@ -137,7 +137,17 @@ interface TrendDataItem {
 }
 
 interface RespondentsData {
-    questions: { code?: string; id?: number; question: string; sectionId?: number; parentQuestionId?: number | null; isGroup?: boolean; answerType?: string | null; unit?: string | null; orderNo?: number }[];
+    questions: {
+        code?: string;
+        id?: number;
+        question: string;
+        sectionId?: number;
+        parentQuestionId?: number | null;
+        isGroup?: boolean;
+        answerType?: string | null;
+        unit?: string | null;
+        orderNo?: number;
+    }[];
     rows: {
         submissionId: number;
         submittedAt: string | null;
@@ -164,7 +174,12 @@ interface RespondentsData {
         } | null;
         answers: Record<
             string,
-            { kepentingan: number | null; kinerja: number | null; value_number?: number | null; value_text?: string | null }
+            {
+                kepentingan: number | null;
+                kinerja: number | null;
+                value_number?: number | null;
+                value_text?: string | null;
+            }
         >;
         timelines: {
             id: number;
@@ -356,7 +371,11 @@ function buildTabs(project: ProjectData) {
     if (project.enableSroi)
         tabs.push({ key: 'sroi', label: 'SROI', icon: 'payments' });
     if (project.enableSroi)
-        tabs.push({ key: 'sroi_respondent', label: 'SROI Respondent', icon: 'group' });
+        tabs.push({
+            key: 'sroi_respondent',
+            label: 'SROI Respondent',
+            icon: 'group',
+        });
     return tabs;
 }
 
@@ -488,7 +507,7 @@ export default function DetailProject({
                         filters={respondentFilters}
                     />
                 );
-            
+
             default:
                 return (
                     <ProjectOverview

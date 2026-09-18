@@ -104,7 +104,6 @@ function getValidityBadgeClass(label: string): string {
 export default function SLOICalculationScores({
     data,
 }: SLOICalculationScoresProps): ReactNode {
-
     if (!data) {
         return (
             <div className="rounded-xl border border-slate-100 bg-white p-8 shadow-sm">
@@ -138,7 +137,8 @@ export default function SLOICalculationScores({
                         <p className="mt-1 text-sm text-slate-500">
                             Dibutuhkan minimal 2 responden dengan jawaban
                             lengkap untuk menghitung analisis reliabilitas dan
-                            validitas. Saat ini: <strong>{data.n} responden</strong>,{' '}
+                            validitas. Saat ini:{' '}
+                            <strong>{data.n} responden</strong>,{' '}
                             <strong>{data.k} pertanyaan</strong>.
                         </p>
                     </div>
@@ -175,7 +175,6 @@ export default function SLOICalculationScores({
                 {/* Unified metric card: 3 columns — reliability | validity | formulas */}
                 <div className="overflow-hidden rounded-xl border border-slate-100 bg-gradient-to-br from-white to-slate-50/40 shadow-sm">
                     <div className="flex flex-col lg:flex-row lg:divide-x lg:divide-slate-100">
-
                         {/* Col 1: Uji Reliabilitas */}
                         <div className="flex flex-col justify-between p-6 lg:w-[22%]">
                             <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">
@@ -193,34 +192,54 @@ export default function SLOICalculationScores({
                                 </span>
                                 <div
                                     className="mt-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
-                                    style={{ backgroundColor: `${alphaColor}12` }}
+                                    style={{
+                                        backgroundColor: `${alphaColor}12`,
+                                    }}
                                 >
                                     {data.alpha > 0.5 ? (
-                                        <ShieldCheck className="size-3.5" style={{ color: alphaColor }} />
+                                        <ShieldCheck
+                                            className="size-3.5"
+                                            style={{ color: alphaColor }}
+                                        />
                                     ) : (
-                                        <XCircle className="size-3.5" style={{ color: alphaColor }} />
+                                        <XCircle
+                                            className="size-3.5"
+                                            style={{ color: alphaColor }}
+                                        />
                                     )}
-                                    <span className="text-xs font-bold" style={{ color: alphaColor }}>
+                                    <span
+                                        className="text-xs font-bold"
+                                        style={{ color: alphaColor }}
+                                    >
                                         {data.alphaStatus}
                                     </span>
                                 </div>
                             </div>
                             <p className="mt-5 text-[10px] leading-4 text-slate-400">
-                                Nilai Cronbach Alpha dari {data.k} pertanyaan terhadap {data.n} responden.
+                                Nilai Cronbach Alpha dari {data.k} pertanyaan
+                                terhadap {data.n} responden.
                             </p>
                         </div>
 
                         {/* Col 2: Validitas Item */}
-                        <div className="flex flex-col justify-between border-t border-slate-100 p-6 lg:border-t-0" style={{ flex: '1 1 0' }}>
+                        <div
+                            className="flex flex-col justify-between border-t border-slate-100 p-6 lg:border-t-0"
+                            style={{ flex: '1 1 0' }}
+                        >
                             <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                                 Realibilitas Item
                             </p>
                             <div className="space-y-2">
                                 {validityCategoryCounts.map((item) => (
-                                    <div key={item.label} className="flex items-center gap-3">
+                                    <div
+                                        key={item.label}
+                                        className="flex items-center gap-3"
+                                    >
                                         <span
                                             className="size-2 shrink-0 rounded-full"
-                                            style={{ backgroundColor: item.color }}
+                                            style={{
+                                                backgroundColor: item.color,
+                                            }}
                                         />
                                         <div className="min-w-0 flex-1">
                                             <p className="truncate text-[11px] font-semibold leading-tight text-slate-700">
@@ -236,13 +255,19 @@ export default function SLOICalculationScores({
                                                 style={{
                                                     width: `${data.k > 0 ? (item.count / data.k) * 100 : 0}%`,
                                                     backgroundColor: item.color,
-                                                    opacity: item.count > 0 ? 1 : 0,
+                                                    opacity:
+                                                        item.count > 0 ? 1 : 0,
                                                 }}
                                             />
                                         </div>
                                         <span
                                             className="w-5 shrink-0 text-right text-sm font-black tabular-nums"
-                                            style={{ color: item.count > 0 ? item.color : '#cbd5e1' }}
+                                            style={{
+                                                color:
+                                                    item.count > 0
+                                                        ? item.color
+                                                        : '#cbd5e1',
+                                            }}
                                         >
                                             {item.count}
                                         </span>
@@ -250,7 +275,11 @@ export default function SLOICalculationScores({
                                 ))}
                             </div>
                             <p className="mt-4 border-t border-slate-100 pt-3 text-[10px] text-slate-400">
-                                Total: <span className="font-semibold text-slate-500">{data.k}</span> pertanyaan
+                                Total:{' '}
+                                <span className="font-semibold text-slate-500">
+                                    {data.k}
+                                </span>{' '}
+                                pertanyaan
                             </p>
                         </div>
 
@@ -262,7 +291,8 @@ export default function SLOICalculationScores({
                                     Uji Realibilitas
                                 </p>
                                 <p className="font-mono text-[11px] leading-5 text-slate-600">
-                                    α = (k / (k−1)) × (1 − Σσ²ᵢ / σ²<sub>total</sub>)
+                                    α = (k / (k−1)) × (1 − Σσ²ᵢ / σ²
+                                    <sub>total</sub>)
                                 </p>
                                 <p className="mt-2 text-[10px] leading-4 text-slate-400">
                                     Konsistensi internal keseluruhan instrumen.
@@ -274,14 +304,15 @@ export default function SLOICalculationScores({
                                     Pearson Correlation
                                 </p>
                                 <p className="font-mono text-[11px] leading-5 text-slate-600">
-                                    r = (nΣXY − ΣXΣY) / √[(nΣX² − (ΣX)²) × (nΣY² − (ΣY)²)]
+                                    r = (nΣXY − ΣXΣY) / √[(nΣX² − (ΣX)²) × (nΣY²
+                                    − (ΣY)²)]
                                 </p>
                                 <p className="mt-2 text-[10px] leading-4 text-slate-400">
-                                    Nilai r per item sebagai x untuk realibilitas.
+                                    Nilai r per item sebagai x untuk
+                                    realibilitas.
                                 </p>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -404,7 +435,10 @@ export default function SLOICalculationScores({
                                 >
                                     {data.alpha.toFixed(4)}
                                 </td>
-                                <td colSpan={2} className="px-4 py-3 text-center">
+                                <td
+                                    colSpan={2}
+                                    className="px-4 py-3 text-center"
+                                >
                                     <span
                                         className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
                                             data.alpha > 0.5
