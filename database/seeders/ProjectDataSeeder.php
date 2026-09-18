@@ -145,9 +145,9 @@ class ProjectDataSeeder extends Seeder
         );
 
         // ─── 6. SROI Template Copy + Respondents ─────────
-        $projectSroiForm = $this->createProjectSroiFormFromTemplate($project, $companyAdmin);
-        $stakeholders = $this->createSroiStakeholdersAndOutcomes($project);
-        $this->createSroiRespondentsWithSubmissions($project, $company, $enumerators, $companyAdmin, $projectSroiForm, $stakeholders);
+        // $projectSroiForm = $this->createProjectSroiFormFromTemplate($project, $companyAdmin);
+        // $stakeholders = $this->createSroiStakeholdersAndOutcomes($project);
+        // $this->createSroiRespondentsWithSubmissions($project, $company, $enumerators, $companyAdmin, $projectSroiForm, $stakeholders);
     }
 
     private function createProjectSroiFormFromTemplate(Project $project, User $companyAdmin): ProjectSroiForm
