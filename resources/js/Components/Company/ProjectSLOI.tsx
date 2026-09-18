@@ -188,8 +188,6 @@ export default function ProjectSLOI({
                 }))}
             />
 
-            <SLOICalculationScores data={sloiReliability ?? null} />
-
             {/* Demographics Row */}
             <div className="grid gap-6 lg:grid-cols-2">
                 <SLOIGenderPieChart data={genderData} />
@@ -199,6 +197,8 @@ export default function ProjectSLOI({
                     <SLOIAgeRangeChart ageRange={demographics.ageRange} />
                 </div>
             </div>
+
+            <SLOICalculationScores data={sloiReliability ?? null} />
 
             {/* Audit Log */}
             {/* <SLOIAuditLog
