@@ -62,7 +62,7 @@ class ProjectDataSeeder extends Seeder
             'target_sloi_count' => 10,
             'enable_ikm' => true,
             'enable_sloi' => true,
-            'enable_sroi' => true,
+            'enable_sroi' => false,
             'ikm_template_id' => $ikmTemplate->id,
             'sloi_template_id' => $sloiTemplate->id,
             'start_date' => '2026-01-01',
