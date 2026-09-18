@@ -5,7 +5,6 @@ import {
     IKMEducationChart,
     IKMGenderPieChart,
     IKMHeader,
-    IKMQuestionScores,
     IKMQuestionTable,
     IKMScoreGauge,
     IKMTrendChart,
@@ -161,26 +160,6 @@ export default function ProjectIKM({
                 />
             </div>
 
-            {/* Question Scores */}
-            <IKMQuestionScores
-                kepentinganScores={questionScores.map((q) => ({
-                    id: q.id,
-                    score: q.importance,
-                }))}
-                kinerjaScores={questionScores.map((q) => ({
-                    id: q.id,
-                    score: q.performance,
-                }))}
-            />
-
-            <ServingQuality questionScores={questionScores} />
-
-            <IKMQuestionTable
-                questionScores={questionScores}
-                allQuestions={allQuestions}
-                projectName={projectName}
-            />
-
             {/* Demographics Row */}
             <div className="grid gap-6 lg:grid-cols-2">
                 <IKMGenderPieChart data={genderData} />
@@ -190,6 +169,14 @@ export default function ProjectIKM({
                     <IKMAgeRangeChart ageRange={demographics.ageRange} />
                 </div>
             </div>
+
+            <ServingQuality questionScores={questionScores} />
+
+            <IKMQuestionTable
+                questionScores={questionScores}
+                allQuestions={allQuestions}
+                projectName={projectName}
+            />
 
             {/* Audit Log */}
             {/* <IKMAuditLog

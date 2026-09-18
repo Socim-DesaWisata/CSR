@@ -36,6 +36,7 @@ export default function ServingQuality({
                     id: item.id,
                     servingQuality,
                     suitabilityIndex,
+                    average: (item.importance + item.performance) / 2,
                 };
             }),
         [questionScores],
@@ -52,35 +53,40 @@ export default function ServingQuality({
     }
 
     return (
-        <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-            <div className="mb-5 flex items-center justify-between">
-                <h3 className="text-base font-bold text-slate-900">
-                    Analisis Serving Quality dan TKI
-                </h3>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <span className="size-3 rounded bg-blue-100 ring-1 ring-blue-200" />
-                    Nilai memenuhi kriteria
+        <section className="overflow-hidden bg-white shadow-sm">
+            <div className="border-b border-emerald-200 bg-gradient-to-r from-emerald-50 to-white px-4 py-4">
+                <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">
+                        Analisis Indikator
+                    </p>
+                    <h3 className="mt-1 text-lg font-bold text-slate-900">
+                        Serving Quality dan TKI
+                    </h3>
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse text-sm">
+            <div className="overflow-x-auto p-3 lg:overflow-visible lg:p-4">
+                <table className="min-w-[560px] text-xs lg:w-full lg:min-w-0 lg:table-fixed">
                     <thead>
                         <tr>
-                            <th className="w-56 border border-slate-300 bg-white px-3 py-2" />
+                            <th className="sticky left-0 z-20 w-40 border border-emerald-200 bg-emerald-700 px-2 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-white">
+                                Metrik
+                            </th>
                             <th
-                                className="border border-slate-300 bg-green-50 px-3 py-2 text-center font-bold text-slate-900"
+                                className="border border-emerald-200 bg-emerald-700 px-2 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-white"
                                 colSpan={rows.length}
                             >
-                                Analisis Serving Quality dan TKI
+                                Indikator IKM
                             </th>
                         </tr>
                         <tr>
-                            <th className="border border-slate-300 bg-white px-3 py-2" />
+                            <th className="sticky left-0 z-20 border border-slate-200 bg-slate-50 px-2 py-2 text-left text-[10px] font-semibold text-slate-500">
+                                Nilai per indikator
+                            </th>
                             {rows.map((row) => (
                                 <th
                                     key={row.id}
-                                    className="min-w-16 border border-slate-300 bg-green-50 px-3 py-2 text-center font-bold text-slate-900"
+                                    className="border border-slate-200 bg-slate-50 px-2 py-2 text-center text-[11px] font-bold text-slate-700"
                                 >
                                     {row.id}
                                 </th>
@@ -89,63 +95,68 @@ export default function ServingQuality({
                     </thead>
                     <tbody>
                         <tr>
-                            <th className="border border-slate-300 bg-white px-3 py-2 text-left font-semibold text-slate-900">
-                                Serving Quality
+                            <th className="sticky left-0 z-10 border border-slate-200 bg-white px-2 py-2 text-left">
+                                <p className="text-[11px] font-bold text-slate-900">
+                                    Serving Quality
+                                </p>
                             </th>
                             {rows.map((row) => (
                                 <td
                                     key={`${row.id}-serving-quality`}
-                                    className={`border border-slate-300 px-3 py-2 text-center text-slate-900 ${
+                                    className={`border border-slate-200 px-2 py-2 text-center ${
                                         row.servingQuality > 0
-                                            ? 'bg-blue-100 font-semibold'
-                                            : 'bg-white'
+                                            ? 'bg-sky-50 text-sky-900'
+                                            : 'bg-white text-slate-700'
                                     }`}
                                 >
-                                    {formatMetric(row.servingQuality)}
+                                    <p className="text-[11px] font-bold">
+                                        {formatMetric(row.servingQuality)}
+                                    </p>
                                 </td>
                             ))}
                         </tr>
                         <tr>
-                            <th className="border border-slate-300 bg-white px-3 py-2 text-left font-semibold text-slate-900">
-                                Tingkat Kesesuaian Indikator
+                            <th className="sticky left-0 z-10 border border-slate-200 bg-white px-2 py-2 text-left">
+                                <p className="text-[11px] font-bold text-slate-900">
+                                    Tingkat Kesesuaian Indikator
+                                </p>
                             </th>
                             {rows.map((row) => (
                                 <td
                                     key={`${row.id}-suitability-index`}
-                                    className={`border border-slate-300 px-3 py-2 text-center text-slate-900 ${
+                                    className={`border border-slate-200 px-2 py-2 text-center ${
                                         row.suitabilityIndex !== null &&
                                         row.suitabilityIndex > 1
-                                            ? 'bg-blue-100 font-semibold'
-                                            : 'bg-white'
+                                            ? 'bg-emerald-50 text-emerald-900'
+                                            : 'bg-white text-slate-700'
                                     }`}
                                 >
-                                    {formatMetric(row.suitabilityIndex)}
+                                    <p className="text-[11px] font-bold">
+                                        {formatMetric(row.suitabilityIndex)}
+                                    </p>
+                                </td>
+                            ))}
+                        </tr>
+                        <tr className="bg-amber-50/70">
+                            <th className="sticky left-0 z-10 border border-amber-200 bg-amber-50 px-2 py-2 text-left">
+                                <p className="text-[11px] font-bold text-amber-950">
+                                    Rerata
+                                </p>
+                            </th>
+                            {rows.map((row) => (
+                                <td
+                                    key={`${row.id}-average`}
+                                    className="border border-amber-200 px-2 py-2 text-center text-amber-950"
+                                >
+                                    <p className="text-[11px] font-bold">
+                                        {formatMetric(row.average)}
+                                    </p>
                                 </td>
                             ))}
                         </tr>
                     </tbody>
                 </table>
             </div>
-
-            <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-                <h4 className="mb-2 font-bold text-slate-900">
-                    Rumus Perhitungan
-                </h4>
-                <div className="grid gap-2 md:grid-cols-2">
-                    <div>
-                        <p className="font-semibold text-slate-800">
-                            Serving Quality
-                        </p>
-                        <p>Kinerja - Kepentingan</p>
-                    </div>
-                    <div>
-                        <p className="font-semibold text-slate-800">
-                            Tingkat Kesesuaian Indikator
-                        </p>
-                        <p>Kinerja / Kepentingan</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </section>
     );
 }

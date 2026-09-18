@@ -1,10 +1,4 @@
-import {
-    AlertTriangle,
-    CheckCircle2,
-    Info,
-    ShieldCheck,
-    XCircle,
-} from 'lucide-react';
+import { AlertTriangle, Info, ShieldCheck, XCircle } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface SloiReliabilityItem {
@@ -68,6 +62,49 @@ const reliabilityGuides = [
     },
 ];
 
+const validityGuides = [
+    {
+        id: 'strong',
+        range: '1 > x >= 0,75',
+        label: 'Korelasi kuat',
+        description:
+            'Item pertanyaan memiliki kemampuan yang sangat baik dalam mengukur variabel SLO (validitas kuat). Butir pernyataan tersebut sangat mencerminkan aspek legitimacy (legitimasi), credibility (kredibilitas), atau psychological identification (identifikasi psikologis) secara akurat dan konsisten dengan skor total.',
+        color: '#15803d',
+    },
+    {
+        id: 'high',
+        range: '0,75 > x >= 0,5',
+        label: 'Korelasi tinggi',
+        description:
+            'Item pertanyaan memiliki kemampuan yang baik dalam mengukur variabel SLO (validitas tinggi). Butir pernyataan tersebut mampu mencerminkan aspek legitimacy (legitimasi), credibility (kredibilitas), atau psychological identification (identifikasi psikologis) yang menggambarkan kondisi sebenarnya.',
+        color: '#16a34a',
+    },
+    {
+        id: 'medium',
+        range: '0,5 > x >= 0,25',
+        label: 'Korelasi sedang',
+        description:
+            'Item pertanyaan cukup valid. Hubungan antara item dengan skor total cukup kuat, namun masih ada varians lain yang tidak dijelaskan oleh faktor utama. Item masih dapat digunakan untuk kuesioner, namun mungkin kurang tajam dalam membedakan persepsi responden dibandingkan item dengan korelasi tinggi.',
+        color: '#ca8a04',
+    },
+    {
+        id: 'weak',
+        range: '0,25 > x > 0',
+        label: 'Korelasi lemah',
+        description:
+            'Item pertanyaan memiliki korelasi lemah. Item ini meragukan. Seringkali item dengan korelasi rendah dianggap tidak valid (gugur) dan sebaiknya dibuang atau direvisi karena responden dianggap kurang memahami maksud dari pertanyaan ini.',
+        color: '#ea580c',
+    },
+    {
+        id: 'none',
+        range: 'Negatif',
+        label: 'Tidak ada korelasi',
+        description:
+            'Item tidak memiliki korelasi dengan skor total. Item pertanyaan tersebut dianggap gagal dalam mengukur keseluruhan skor Social License to Operate. Item ini tidak searah dengan persepsi mayoritas responden.',
+        color: '#dc2626',
+    },
+];
+
 function getAlphaColor(alpha: number): string {
     if (alpha >= 0.9) return '#15803d';
     if (alpha >= 0.7) return '#16a34a';
@@ -76,25 +113,37 @@ function getAlphaColor(alpha: number): string {
     return '#dc2626';
 }
 
+function getReliabilityGuide(pearson: number) {
+    if (pearson >= 0.9) return reliabilityGuides[0];
+    if (pearson >= 0.7) return reliabilityGuides[1];
+    if (pearson >= 0.6) return reliabilityGuides[2];
+    if (pearson > 0.5) return reliabilityGuides[3];
+
+    return reliabilityGuides[4];
+}
+
 function getPearsonBarWidth(pearson: number): number {
     return Math.min(Math.max(pearson, 0) * 100, 100);
 }
 
-function getValidityColor(label: string): string {
-    const guide = reliabilityGuides.find((item) => item.label === label);
+function getPearsonGuide(pearson: number) {
+    if (pearson >= 0.75) return validityGuides[0];
+    if (pearson >= 0.5) return validityGuides[1];
+    if (pearson >= 0.25) return validityGuides[2];
+    if (pearson > 0) return validityGuides[3];
 
-    return guide?.color ?? '#64748b';
+    return validityGuides[4];
 }
 
-function getValidityBadgeClass(label: string): string {
-    switch (label) {
-        case 'Reliabilitas sangat tinggi':
+function getValidityBadgeClass(guideId: string): string {
+    switch (guideId) {
+        case 'strong':
             return 'bg-green-50 text-green-700';
-        case 'Reliabilitas tinggi':
+        case 'high':
             return 'bg-emerald-50 text-emerald-700';
-        case 'Reliabilitas sedang':
+        case 'medium':
             return 'bg-amber-50 text-amber-700';
-        case 'Reliabilitas rendah':
+        case 'weak':
             return 'bg-orange-50 text-orange-700';
         default:
             return 'bg-red-50 text-red-600';
@@ -149,9 +198,9 @@ export default function SLOICalculationScores({
 
     const alphaColor = getAlphaColor(data.alpha);
 
-    const validityCategoryCounts = reliabilityGuides.map((guide) => {
+    const reliabilityCategoryCounts = reliabilityGuides.map((guide) => {
         const count = data.items.filter(
-            (item) => item.validityLabel === guide.label,
+            (item) => getReliabilityGuide(item.pearson).label === guide.label,
         ).length;
 
         return {
@@ -159,6 +208,40 @@ export default function SLOICalculationScores({
             count,
         };
     });
+
+    const renderGuides = (
+        guides: Array<{
+            range: string;
+            label: string;
+            description: string;
+            color: string;
+        }>,
+    ): ReactNode => (
+        <div className="space-y-3">
+            {guides.map((guide) => (
+                <div
+                    key={guide.label}
+                    className="rounded-lg border border-slate-100 bg-slate-50/60 p-4"
+                >
+                    <div className="mb-1 flex items-center gap-2">
+                        <span
+                            className="size-2.5 rounded-full"
+                            style={{ backgroundColor: guide.color }}
+                        />
+                        <span className="font-mono text-[11px] text-slate-500">
+                            {guide.range}
+                        </span>
+                    </div>
+                    <p className="text-sm font-semibold text-slate-900">
+                        {guide.label}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">
+                        {guide.description}
+                    </p>
+                </div>
+            ))}
+        </div>
+    );
 
     return (
         <div className="space-y-6">
@@ -172,96 +255,78 @@ export default function SLOICalculationScores({
                     </p>
                 </div>
 
-                {/* Unified metric card: 3 columns — reliability | validity | formulas */}
-                <div className="overflow-hidden rounded-xl border border-slate-100 bg-gradient-to-br from-white to-slate-50/40 shadow-sm">
+                <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
                     <div className="flex flex-col lg:flex-row lg:divide-x lg:divide-slate-100">
-                        {/* Col 1: Uji Reliabilitas */}
-                        <div className="flex flex-col justify-between p-6 lg:w-[22%]">
-                            <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                                Uji Realibilitas
-                            </p>
+                        <div className="flex min-h-80 flex-col justify-between p-6 lg:w-[32%]">
                             <div>
+                                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                    Uji Reliabilitas
+                                </p>
                                 <span
-                                    className="block font-black tabular-nums leading-none tracking-tight"
+                                    className="mt-16 block font-black tabular-nums leading-none tracking-tight"
                                     style={{
-                                        fontSize: 'clamp(1.75rem, 3vw, 2.5rem)',
+                                        fontSize: 'clamp(2rem, 3vw, 2.75rem)',
                                         color: alphaColor,
                                     }}
                                 >
                                     {data.alpha.toFixed(4)}
                                 </span>
-                                <div
-                                    className="mt-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
+                                <span
+                                    className="mt-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
                                     style={{
                                         backgroundColor: `${alphaColor}12`,
+                                        color: alphaColor,
                                     }}
                                 >
                                     {data.alpha > 0.5 ? (
-                                        <ShieldCheck
-                                            className="size-3.5"
-                                            style={{ color: alphaColor }}
-                                        />
+                                        <ShieldCheck className="size-3.5" />
                                     ) : (
-                                        <XCircle
-                                            className="size-3.5"
-                                            style={{ color: alphaColor }}
-                                        />
+                                        <XCircle className="size-3.5" />
                                     )}
-                                    <span
-                                        className="text-xs font-bold"
-                                        style={{ color: alphaColor }}
-                                    >
-                                        {data.alphaStatus}
-                                    </span>
-                                </div>
+                                    {data.alphaStatus}
+                                </span>
                             </div>
-                            <p className="mt-5 text-[10px] leading-4 text-slate-400">
+                            <p className="text-[10px] leading-5 text-slate-400">
                                 Nilai Cronbach Alpha dari {data.k} pertanyaan
                                 terhadap {data.n} responden.
                             </p>
                         </div>
 
-                        {/* Col 2: Validitas Item */}
-                        <div
-                            className="flex flex-col justify-between border-t border-slate-100 p-6 lg:border-t-0"
-                            style={{ flex: '1 1 0' }}
-                        >
-                            <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                                Realibilitas Item
+                        <div className="flex-1 border-t border-slate-100 p-6 lg:border-t-0">
+                            <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                Reliabilitas Item
                             </p>
-                            <div className="space-y-2">
-                                {validityCategoryCounts.map((item) => (
+                            <div className="space-y-3">
+                                {reliabilityCategoryCounts.map((item) => (
                                     <div
                                         key={item.label}
                                         className="flex items-center gap-3"
                                     >
                                         <span
-                                            className="size-2 shrink-0 rounded-full"
+                                            className="size-2.5 shrink-0 rounded-full"
                                             style={{
                                                 backgroundColor: item.color,
                                             }}
                                         />
                                         <div className="min-w-0 flex-1">
-                                            <p className="truncate text-[11px] font-semibold leading-tight text-slate-700">
+                                            <p className="text-[11px] font-semibold text-slate-700">
                                                 {item.label}
                                             </p>
                                             <p className="font-mono text-[9px] text-slate-400">
                                                 {item.range}
                                             </p>
                                         </div>
-                                        <div className="h-1 w-14 shrink-0 overflow-hidden rounded-full bg-slate-100">
+                                        <div className="h-1 w-16 shrink-0 overflow-hidden rounded-full bg-slate-100">
                                             <div
-                                                className="h-full rounded-full transition-all duration-500"
+                                                className="h-full rounded-full"
                                                 style={{
                                                     width: `${data.k > 0 ? (item.count / data.k) * 100 : 0}%`,
                                                     backgroundColor: item.color,
-                                                    opacity:
-                                                        item.count > 0 ? 1 : 0,
                                                 }}
                                             />
                                         </div>
                                         <span
-                                            className="w-5 shrink-0 text-right text-sm font-black tabular-nums"
+                                            className="w-5 text-right text-sm font-black tabular-nums"
                                             style={{
                                                 color:
                                                     item.count > 0
@@ -274,44 +339,13 @@ export default function SLOICalculationScores({
                                     </div>
                                 ))}
                             </div>
-                            <p className="mt-4 border-t border-slate-100 pt-3 text-[10px] text-slate-400">
+                            <p className="mt-5 border-t border-slate-100 pt-3 text-[10px] text-slate-400">
                                 Total:{' '}
                                 <span className="font-semibold text-slate-500">
                                     {data.k}
                                 </span>{' '}
                                 pertanyaan
                             </p>
-                        </div>
-
-                        {/* Col 3: Formulas stacked top + bottom */}
-                        <div className="flex flex-col divide-y divide-slate-100 border-t border-slate-100 lg:w-[28%] lg:border-t-0">
-                            {/* Top: Cronbach Alpha formula */}
-                            <div className="flex flex-1 flex-col justify-center bg-slate-50/60 p-5">
-                                <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                                    Uji Realibilitas
-                                </p>
-                                <p className="font-mono text-[11px] leading-5 text-slate-600">
-                                    α = (k / (k−1)) × (1 − Σσ²ᵢ / σ²
-                                    <sub>total</sub>)
-                                </p>
-                                <p className="mt-2 text-[10px] leading-4 text-slate-400">
-                                    Konsistensi internal keseluruhan instrumen.
-                                </p>
-                            </div>
-                            {/* Bottom: Pearson formula */}
-                            <div className="flex flex-1 flex-col justify-center bg-slate-50/60 p-5">
-                                <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                                    Pearson Correlation
-                                </p>
-                                <p className="font-mono text-[11px] leading-5 text-slate-600">
-                                    r = (nΣXY − ΣXΣY) / √[(nΣX² − (ΣX)²) × (nΣY²
-                                    − (ΣY)²)]
-                                </p>
-                                <p className="mt-2 text-[10px] leading-4 text-slate-400">
-                                    Nilai r per item sebagai x untuk
-                                    realibilitas.
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -323,8 +357,8 @@ export default function SLOICalculationScores({
                         Detail Per Pertanyaan
                     </h4>
                     <p className="mt-0.5 text-xs text-slate-400">
-                        Rerata jawaban, korelasi Pearson, dan kategori validitas
-                        untuk setiap pertanyaan
+                        Rerata jawaban dan kategori korelasi Pearson untuk
+                        setiap pertanyaan
                     </p>
                 </div>
 
@@ -347,110 +381,84 @@ export default function SLOICalculationScores({
                                 <th className="whitespace-nowrap px-4 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-slate-400">
                                     Korelasi
                                 </th>
-                                <th className="whitespace-nowrap px-6 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                                    Realibilitas
-                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
-                            {data.items.map((item, idx) => (
-                                <tr
-                                    key={item.code}
-                                    className={`transition-colors hover:bg-slate-50/50 ${
-                                        idx % 2 === 0
-                                            ? 'bg-white'
-                                            : 'bg-slate-25'
-                                    }`}
-                                >
-                                    <td className="whitespace-nowrap px-6 py-3.5">
-                                        <span className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs font-bold text-slate-600">
-                                            {item.code}
-                                        </span>
-                                    </td>
-                                    <td className="max-w-xs px-4 py-3.5 text-xs text-slate-600">
-                                        <div
-                                            className="line-clamp-2 [&>strong]:font-bold [&>strong]:text-slate-900"
-                                            title={item.raw_question}
-                                            dangerouslySetInnerHTML={{
-                                                __html: item.question,
-                                            }}
-                                        />
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-3.5 text-center font-mono text-xs font-semibold text-slate-700">
-                                        {item.mean.toFixed(2)}
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-3.5 text-center">
-                                        <span
-                                            className="font-mono text-xs font-bold"
-                                            style={{
-                                                color: getValidityColor(
-                                                    item.validityLabel,
-                                                ),
-                                            }}
-                                        >
-                                            {item.pearson.toFixed(4)}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3.5">
-                                        <div className="flex items-center justify-center gap-2">
-                                            <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100">
-                                                <div
-                                                    className="h-full rounded-full transition-all"
-                                                    style={{
-                                                        width: `${getPearsonBarWidth(item.pearson)}%`,
-                                                        backgroundColor:
-                                                            getValidityColor(
-                                                                item.validityLabel,
-                                                            ),
-                                                    }}
-                                                />
+                            {data.items.map((item, idx) => {
+                                const guide = getPearsonGuide(item.pearson);
+
+                                return (
+                                    <tr
+                                        key={item.code}
+                                        className={`transition-colors hover:bg-slate-50/50 ${
+                                            idx % 2 === 0
+                                                ? 'bg-white'
+                                                : 'bg-slate-25'
+                                        }`}
+                                    >
+                                        <td className="whitespace-nowrap px-6 py-3.5">
+                                            <span className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs font-bold text-slate-600">
+                                                {item.code}
+                                            </span>
+                                        </td>
+                                        <td className="max-w-xs px-4 py-3.5 text-xs text-slate-600">
+                                            <div
+                                                className="line-clamp-2 [&>strong]:font-bold [&>strong]:text-slate-900"
+                                                title={item.raw_question}
+                                                dangerouslySetInnerHTML={{
+                                                    __html: item.question,
+                                                }}
+                                            />
+                                        </td>
+                                        <td className="whitespace-nowrap px-4 py-3.5 text-center font-mono text-xs font-semibold text-slate-700">
+                                            {item.mean.toFixed(2)}
+                                        </td>
+                                        <td className="whitespace-nowrap px-4 py-3.5 text-center">
+                                            <span
+                                                className="font-mono text-xs font-bold"
+                                                style={{
+                                                    color: guide.color,
+                                                }}
+                                            >
+                                                {item.pearson.toFixed(4)}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="flex flex-col items-center gap-2">
+                                                <span
+                                                    className={`inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-bold ${getValidityBadgeClass(guide.id)}`}
+                                                >
+                                                    {guide.label}
+                                                </span>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className="whitespace-nowrap px-6 py-3.5 text-center">
-                                        <span
-                                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${getValidityBadgeClass(item.validityLabel)}`}
-                                        >
-                                            {item.isValid ? (
-                                                <CheckCircle2 className="size-3" />
-                                            ) : (
-                                                <XCircle className="size-3" />
-                                            )}
-                                            {item.validityLabel}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                         <tfoot>
-                            <tr className="border-t-2 border-slate-200 bg-slate-50/80">
+                            <tr className="border-t border-slate-200 bg-slate-50/70">
                                 <td className="px-6 py-3" />
-                                <td className="px-4 py-3 text-xs font-bold text-slate-700">
-                                    Uji Realibilitas
+                                <td className="px-4 py-3 text-xs font-semibold text-slate-700">
+                                    Uji Reliabilitas
                                 </td>
-                                <td className="px-4 py-3" />
+                                <td className="px-4 py-3 text-xs text-slate-500">
+                                    Cronbach Alpha
+                                </td>
                                 <td
                                     className="px-4 py-3 text-center font-mono text-xs font-bold"
                                     style={{ color: alphaColor }}
                                 >
                                     {data.alpha.toFixed(4)}
                                 </td>
-                                <td
-                                    colSpan={2}
-                                    className="px-4 py-3 text-center"
-                                >
+                                <td className="px-6 py-3 text-center">
                                     <span
-                                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
+                                        className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${
                                             data.alpha > 0.5
-                                                ? 'bg-green-50 text-green-700'
-                                                : 'bg-red-50 text-red-600'
+                                                ? 'bg-white text-green-700 ring-green-200'
+                                                : 'bg-white text-red-600 ring-red-200'
                                         }`}
                                     >
-                                        {data.alpha > 0.5 ? (
-                                            <ShieldCheck className="size-3.5" />
-                                        ) : (
-                                            <XCircle className="size-3.5" />
-                                        )}
                                         {data.alphaStatus}
                                     </span>
                                 </td>
@@ -460,67 +468,30 @@ export default function SLOICalculationScores({
                 </div>
             </div>
 
-            <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-                <h4 className="mb-2 text-sm font-bold text-slate-900">
-                    Keterangan Uji Reliabilitas
-                </h4>
-                <p className="mb-4 text-sm text-slate-500">
-                    Uji reliabilitas mengukur seberapa konsisten tingkat
-                    persepsi responden secara keseluruhan dalam mengukur Social
-                    License to Operate.
-                </p>
+            <div className="grid gap-6 lg:grid-cols-2">
+                <section className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+                    <h4 className="mb-2 text-sm font-bold text-slate-900">
+                        Keterangan Uji Reliabilitas
+                    </h4>
+                    <p className="mb-4 text-sm text-slate-500">
+                        Uji reliabilitas mengukur seberapa konsisten tingkat
+                        persepsi responden secara keseluruhan dalam mengukur
+                        Social License to Operate.
+                    </p>
+                    {renderGuides(reliabilityGuides)}
+                </section>
 
-                <div className="space-y-3">
-                    {reliabilityGuides.map((item) => (
-                        <div
-                            key={item.label}
-                            className="rounded-lg border border-slate-100 bg-slate-50/60 p-4"
-                        >
-                            <div className="mb-1 flex items-center gap-2">
-                                <span
-                                    className="size-2.5 rounded-full"
-                                    style={{ backgroundColor: item.color }}
-                                />
-                                <span className="font-mono text-[11px] text-slate-500">
-                                    {item.range}
-                                </span>
-                            </div>
-                            <p className="text-sm font-semibold text-slate-900">
-                                {item.label}
-                            </p>
-                            <p className="mt-1 text-sm leading-6 text-slate-600">
-                                {item.description}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-                <h4 className="mb-4 text-sm font-bold text-slate-900">
-                    Panduan Reliabilitas Item
-                </h4>
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                    {reliabilityGuides.map((item) => (
-                        <div
-                            key={item.label}
-                            className="rounded-lg border border-slate-100 bg-slate-50/60 p-4"
-                        >
-                            <span
-                                className="mb-2 inline-flex rounded-full px-2 py-0.5 text-[11px] font-bold"
-                                style={{
-                                    backgroundColor: `${item.color}14`,
-                                    color: item.color,
-                                }}
-                            >
-                                {item.label}
-                            </span>
-                            <p className="font-mono text-xs text-slate-500">
-                                {item.range}
-                            </p>
-                        </div>
-                    ))}
-                </div>
+                <section className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+                    <h4 className="mb-2 text-sm font-bold text-slate-900">
+                        Keterangan Uji Validitas
+                    </h4>
+                    <p className="mb-4 text-sm text-slate-500">
+                        Uji Validitas : Mengukur seberapa kuat masing-masing
+                        item pertanyaan dengan keseluruhan skor total Social
+                        License to Operate
+                    </p>
+                    {renderGuides(validityGuides)}
+                </section>
             </div>
         </div>
     );

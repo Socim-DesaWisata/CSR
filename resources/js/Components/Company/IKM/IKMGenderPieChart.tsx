@@ -41,7 +41,7 @@ export default function IKMGenderPieChart({
                                         cy="50"
                                         r={r}
                                         fill="transparent"
-                                        stroke="#3b82f6"
+                                        stroke="#166534"
                                         strokeWidth="20"
                                         strokeDasharray={`${maleDash} ${circumference}`}
                                     />
@@ -51,7 +51,7 @@ export default function IKMGenderPieChart({
                                         cy="50"
                                         r={r}
                                         fill="transparent"
-                                        stroke="#ec4899"
+                                        stroke="#86efac"
                                         strokeWidth="20"
                                         strokeDasharray={`${femaleDash} ${circumference}`}
                                         strokeDashoffset={`${-maleDash}`}
@@ -72,7 +72,7 @@ export default function IKMGenderPieChart({
                 {/* Legend */}
                 <div className="flex justify-center gap-8">
                     <div className="flex items-center gap-2">
-                        <div className="size-4 rounded-full bg-blue-500"></div>
+                        <div className="size-4 rounded-full bg-green-800"></div>
                         <div>
                             <p className="text-sm font-bold text-slate-700">
                                 Laki-laki
@@ -84,7 +84,7 @@ export default function IKMGenderPieChart({
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="size-4 rounded-full bg-pink-500"></div>
+                        <div className="size-4 rounded-full bg-green-300"></div>
                         <div>
                             <p className="text-sm font-bold text-slate-700">
                                 Perempuan
