@@ -5,7 +5,7 @@ import {
     SearchInput,
 } from '@/Components/Enumerator';
 import EnumeratorLayout from '@/Layouts/EnumeratorLayout';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { debounce } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -83,7 +83,26 @@ export default function ListSroi({ projects, filters }: ListSroiProps) {
                         <ProjectCard
                             key={project.id}
                             project={project}
-                            showActions={false}
+                            actions={
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Link
+                                        href={route(
+                                            'enumerator.sroi.data',
+                                            project.id,
+                                        )}
+                                        className="flex items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark"
+                                    >
+                                        Data
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        disabled
+                                        className="cursor-not-allowed rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-bold text-gray-400"
+                                    >
+                                        Perhitungan
+                                    </button>
+                                </div>
+                            }
                         />
                     ))}
                 </div>

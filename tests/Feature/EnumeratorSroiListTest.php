@@ -103,3 +103,23 @@ it('forbids non-enumerator users from the SROI project list', function () {
         ->get(route('enumerator.sroi.index'))
         ->assertForbidden();
 });
+
+it('shows the read-only SROI data page for an assigned project', function () {
+    $fixture = createEnumeratorSroiListFixture();
+
+    $this->actingAs($fixture['enumerator'])
+        ->get(route('enumerator.sroi.data', $fixture['assignedSroi']))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Enumerator/SROI/DataSroi')
+            ->where('project.id', $fixture['assignedSroi']->id)
+            ->where('project.enable_sroi', true));
+});
+
+it('hides SROI data from enumerators without a project assignment', function () {
+    $fixture = createEnumeratorSroiListFixture();
+
+    $this->actingAs($fixture['enumerator'])
+        ->get(route('enumerator.sroi.data', $fixture['unassignedSroi']))
+        ->assertNotFound();
+});

@@ -42,6 +42,8 @@
         "@radix-ui/react-label": "^2.1.8",
         "@radix-ui/react-slot": "^1.2.4",
         "@types/lodash": "^4.17.23",
+        "@univerjs/preset-sheets-core": "^0.25.0",
+        "@univerjs/presets": "^0.25.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cobe": "^0.6.5",
@@ -49,6 +51,7 @@
         "lucide-react": "^0.562.0",
         "motion": "^12.35.0",
         "recharts": "^2.15.4",
+        "rxjs": "^7.8.2",
         "tailwind-merge": "^3.5.0",
         "tailwindcss-animate": "^1.0.7"
     }
