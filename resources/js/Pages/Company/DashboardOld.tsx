@@ -26,7 +26,6 @@
 //     name: string;
 //     ikmHeight: string;
 //     sloiHeight: string;
-//     sroiHeight: string;
 // }
 
 // interface ActivityData {
@@ -66,7 +65,6 @@
 // const chartLegend = [
 //     { label: 'IKM', color: 'bg-primary' },
 //     { label: 'SLOI', color: 'bg-primary/50' },
-//     { label: 'SROI', color: 'bg-slate-200' },
 // ];
 
 // export default function Dashboard({
@@ -139,7 +137,6 @@
 //                 <section className="grid grid-cols-1 gap-8 lg:grid-cols-3">
 //                     <BarChart
 //                         title="Ringkasan Performa Proyek"
-//                         description="Perbandingan skor IKM, SLOI, dan SROI per proyek aktif."
 //                         legend={chartLegend}
 //                         projects={projects}
 //                     />

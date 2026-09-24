@@ -172,10 +172,10 @@ class DashboardService
                 'percentageLabel' => 'Positif',
                 'totalSubmissions' => $submissions->count(),
                 'scores' => [
-                    ['label' => 'Sangat Baik (≥3.5)', 'value' => round(($sangatBaik / $total) * 100) . '%'],
-                    ['label' => 'Baik (2.5-3.49)', 'value' => round(($baik / $total) * 100) . '%'],
-                    ['label' => 'Cukup (1.5-2.49)', 'value' => round(($cukup / $total) * 100) . '%'],
-                    ['label' => 'Kurang (<1.5)', 'value' => round(($kurang / $total) * 100) . '%'],
+                    ['label' => 'Sangat Baik (≥3.5)', 'value' => round(($sangatBaik / $total) * 100).'%'],
+                    ['label' => 'Baik (2.5-3.49)', 'value' => round(($baik / $total) * 100).'%'],
+                    ['label' => 'Cukup (1.5-2.49)', 'value' => round(($cukup / $total) * 100).'%'],
+                    ['label' => 'Kurang (<1.5)', 'value' => round(($kurang / $total) * 100).'%'],
                 ],
             ];
         } else {
@@ -194,12 +194,12 @@ class DashboardService
                 'percentageLabel' => 'Positif',
                 'totalSubmissions' => $submissions->count(),
                 'scores' => [
-                    ['label' => 'Sangat Baik (≥5)', 'value' => round(($sangatBaik / $total) * 100) . '%'],
-                    ['label' => 'Baik (4-4.99)', 'value' => round(($baik / $total) * 100) . '%'],
-                    ['label' => 'Cukup (3-3.99)', 'value' => round(($cukup / $total) * 100) . '%'],
-                    ['label' => 'Kurang Puas (2-2.99)', 'value' => round(($kurangBaik / $total) * 100) . '%'],
-                    ['label' => 'Kurang (1-1.99)', 'value' => round(($kurang / $total) * 100) . '%'],
-                    ['label' => 'Sangat Kurang (<1)', 'value' => round(($sangatKurang / $total) * 100) . '%'],
+                    ['label' => 'Sangat Baik (≥5)', 'value' => round(($sangatBaik / $total) * 100).'%'],
+                    ['label' => 'Baik (4-4.99)', 'value' => round(($baik / $total) * 100).'%'],
+                    ['label' => 'Cukup (3-3.99)', 'value' => round(($cukup / $total) * 100).'%'],
+                    ['label' => 'Kurang Puas (2-2.99)', 'value' => round(($kurangBaik / $total) * 100).'%'],
+                    ['label' => 'Kurang (1-1.99)', 'value' => round(($kurang / $total) * 100).'%'],
+                    ['label' => 'Sangat Kurang (<1)', 'value' => round(($sangatKurang / $total) * 100).'%'],
                 ],
             ];
         }
@@ -241,10 +241,10 @@ class DashboardService
             'percentage' => $positivePercentage,
             'percentageLabel' => 'Positif',
             'scores' => [
-                ['label' => 'Sangat Baik', 'value' => round(($sangatBaik / $total) * 100) . '%'],
-                ['label' => 'Baik', 'value' => round(($baik / $total) * 100) . '%'],
-                ['label' => 'Cukup', 'value' => round(($cukup / $total) * 100) . '%'],
-                ['label' => 'Kurang', 'value' => round(($kurang / $total) * 100) . '%'],
+                ['label' => 'Sangat Baik', 'value' => round(($sangatBaik / $total) * 100).'%'],
+                ['label' => 'Baik', 'value' => round(($baik / $total) * 100).'%'],
+                ['label' => 'Cukup', 'value' => round(($cukup / $total) * 100).'%'],
+                ['label' => 'Kurang', 'value' => round(($kurang / $total) * 100).'%'],
             ],
         ];
     }
@@ -315,21 +315,18 @@ class DashboardService
             $icon = match ($submission->assessment_type) {
                 'IKM' => 'sentiment_satisfied',
                 'SLOI' => 'handshake',
-                'SROI' => 'payments',
                 default => 'description',
             };
 
             $iconBgColor = match ($submission->assessment_type) {
                 'IKM' => 'bg-blue-500/10',
                 'SLOI' => 'bg-amber-500/10',
-                'SROI' => 'bg-primary/10',
                 default => 'bg-slate-500/10',
             };
 
             $iconColor = match ($submission->assessment_type) {
                 'IKM' => 'text-blue-500',
                 'SLOI' => 'text-amber-500',
-                'SROI' => 'text-primary',
                 default => 'text-slate-500',
             };
 
@@ -556,14 +553,11 @@ class DashboardService
                 ->whereBetween('submitted_at', [$start, $end])->count();
             $sloi = Submission::where('assessment_type', 'SLOI')
                 ->whereBetween('submitted_at', [$start, $end])->count();
-            $sroi = Submission::where('assessment_type', 'SROI')
-                ->whereBetween('submitted_at', [$start, $end])->count();
 
             $data[] = [
                 'date' => $date->translatedFormat('d M'),
                 'ikm' => $ikm,
                 'sloi' => $sloi,
-                'sroi' => $sroi,
             ];
         }
 
@@ -619,7 +613,7 @@ class DashboardService
                 'id' => $counter++,
                 'type' => 'submission',
                 'action' => "Submission {$s->assessment_type} {$statusLabel}",
-                'description' => ($s->project?->name ?? 'Proyek') . ': ' . ($s->respondent?->name ?? 'Responden') . ' oleh ' . ($s->enumerator?->name ?? 'Enumerator'),
+                'description' => ($s->project?->name ?? 'Proyek').': '.($s->respondent?->name ?? 'Responden').' oleh '.($s->enumerator?->name ?? 'Enumerator'),
                 'time' => $s->submitted_at ? $s->submitted_at->diffForHumans() : '-',
             ];
         }
@@ -634,8 +628,8 @@ class DashboardService
             $activities[] = [
                 'id' => $counter++,
                 'type' => 'project',
-                'action' => 'Proyek ' . ($p->status === 'active' ? 'aktif' : 'dibuat'),
-                'description' => $p->name . ' - ' . ($p->company?->name ?? '-'),
+                'action' => 'Proyek '.($p->status === 'active' ? 'aktif' : 'dibuat'),
+                'description' => $p->name.' - '.($p->company?->name ?? '-'),
                 'time' => $p->created_at ? $p->created_at->diffForHumans() : '-',
             ];
         }

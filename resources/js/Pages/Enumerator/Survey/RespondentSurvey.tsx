@@ -22,38 +22,6 @@ interface DescriptiveQuestion {
     title: string;
 }
 
-interface ProjectStakeholder {
-    id: number;
-    name: string;
-}
-
-interface ProjectSroiQuestion {
-    id: number;
-    sectionId: number;
-    parentQuestionId: number | null;
-    questionText: string;
-    helpText: string | null;
-    answerType: 'text' | 'number' | null;
-    unit: string | null;
-    isGroup: boolean;
-    orderNo: number;
-}
-
-interface ProjectSroiSection {
-    id: number;
-    title: string;
-    description: string | null;
-    orderNo: number;
-    questions: ProjectSroiQuestion[];
-}
-
-interface ProjectSroiForm {
-    id: number;
-    name: string;
-    description: string | null;
-    sections: ProjectSroiSection[];
-}
-
 interface Project {
     id: number;
     company_id: number;
@@ -68,8 +36,6 @@ interface Props {
     project: Project;
     surveyType: string;
     questions: Question[];
-    projectSroiForm?: ProjectSroiForm | null;
-    projectStakeholders?: ProjectStakeholder[];
     descriptiveQuestions: DescriptiveQuestion[];
 }
 
@@ -83,8 +49,6 @@ export default function RespondentSurvey({
     project,
     surveyType,
     questions,
-    projectSroiForm,
-    projectStakeholders = [],
     descriptiveQuestions,
 }: Props) {
     const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
@@ -93,7 +57,6 @@ export default function RespondentSurvey({
     // Respondent state — 1:1 dengan kolom tabel `respondents`
     const [respondentData, setRespondentData] = useState<RespondentData>({
         name: '',
-        stakeholder_id: '',
         address: '',
         phone: '',
         age: '',
@@ -105,8 +68,6 @@ export default function RespondentSurvey({
     });
 
     const [answers, setAnswers] = useState<QuestionAnswers>({});
-    const [sroiAnswers, setSroiAnswers] = useState<Record<number, string>>({});
-    const isSroi = surveyType.toUpperCase() === 'SROI';
 
     // Descriptive answers state
     const [descriptiveAnswers, setDescriptiveAnswers] =
@@ -172,10 +133,6 @@ export default function RespondentSurvey({
 
         // Respondent fields — sesuai kolom tabel `respondents`
         formData.append('respondent[name]', respondentData.name);
-        formData.append(
-            'respondent[stakeholder_id]',
-            respondentData.stakeholder_id ?? '',
-        );
         formData.append('respondent[address]', respondentData.address);
         formData.append('respondent[phone]', respondentData.phone);
         formData.append('respondent[age]', respondentData.age);
@@ -216,41 +173,14 @@ export default function RespondentSurvey({
 
         // Answers: [{question_id, type, value}, ...]
         // Key format: `${questionId}-${type}` e.g. "3-ikm-kepentingan", "3-ikm-kinerja", "5-sloi"
-        if (isSroi) {
-            Object.entries(sroiAnswers).forEach(
-                ([questionId, value], index) => {
-                    const question = projectSroiForm?.sections
-                        .flatMap((section) => section.questions)
-                        .find((item) => item.id === Number(questionId));
-
-                    formData.append(
-                        `sroi_answers[${index}][project_sroi_question_id]`,
-                        questionId,
-                    );
-
-                    if (question?.answerType === 'number') {
-                        formData.append(
-                            `sroi_answers[${index}][value_number]`,
-                            value,
-                        );
-                    } else {
-                        formData.append(
-                            `sroi_answers[${index}][value_text]`,
-                            value,
-                        );
-                    }
-                },
-            );
-        } else {
-            Object.entries(answers).forEach(([key, value], index) => {
-                const dashIdx = key.indexOf('-');
-                const questionId = key.substring(0, dashIdx);
-                const type = key.substring(dashIdx + 1);
-                formData.append(`answers[${index}][question_id]`, questionId);
-                formData.append(`answers[${index}][type]`, type);
-                formData.append(`answers[${index}][value]`, String(value));
-            });
-        }
+        Object.entries(answers).forEach(([key, value], index) => {
+            const dashIndex = key.indexOf('-');
+            const questionId = key.substring(0, dashIndex);
+            const type = key.substring(dashIndex + 1);
+            formData.append(`answers[${index}][question_id]`, questionId);
+            formData.append(`answers[${index}][type]`, type);
+            formData.append(`answers[${index}][value]`, String(value));
+        });
 
         // Descriptive answers: [{question_id, answer}, ...]
         Object.entries(descriptiveAnswers).forEach(([qId, answer], index) => {
@@ -281,7 +211,6 @@ export default function RespondentSurvey({
                     if (redirectTo === 'continue') {
                         setRespondentData({
                             name: '',
-                            stakeholder_id: '',
                             address: '',
                             phone: '',
                             age: '',
@@ -292,7 +221,6 @@ export default function RespondentSurvey({
                             monthly_income: '',
                         });
                         setAnswers({});
-                        setSroiAnswers({});
                         setDescriptiveAnswers({});
                         setCurrentStep(1);
                     }
@@ -378,13 +306,6 @@ export default function RespondentSurvey({
             {currentStep === 1 && (
                 <RespondentForm
                     data={respondentData}
-                    isSroi={isSroi}
-                    stakeholderOptions={projectStakeholders.map(
-                        (stakeholder) => ({
-                            value: String(stakeholder.id),
-                            label: stakeholder.name,
-                        }),
-                    )}
                     onChange={setRespondentData}
                     onBack={handleBackFromRespondent}
                     onNext={() => goToStep(2)}
@@ -402,9 +323,6 @@ export default function RespondentSurvey({
                     descriptiveQuestions={descriptiveQuestions}
                     descriptiveAnswers={descriptiveAnswers}
                     onDescriptiveChange={setDescriptiveAnswers}
-                    projectSroiForm={projectSroiForm}
-                    sroiAnswers={sroiAnswers}
-                    onSroiChange={setSroiAnswers}
                     onBack={() => goToStep(1)}
                     onNext={() => goToStep(3)}
                     onClose={handleCloseQuestionnaire}
@@ -416,16 +334,6 @@ export default function RespondentSurvey({
                     respondentData={respondentData}
                     answers={answers}
                     questions={questions}
-                    surveyType={surveyType}
-                    projectSroiForm={projectSroiForm}
-                    sroiAnswers={sroiAnswers}
-                    stakeholderName={
-                        projectStakeholders.find(
-                            (item) =>
-                                String(item.id) ===
-                                respondentData.stakeholder_id,
-                        )?.name ?? null
-                    }
                     gpsLocation={gpsLocation}
                     onBack={() => goToStep(2)}
                     onEditRespondent={() => goToStep(1)}

@@ -55,7 +55,6 @@ it('returns simplified sloi reliability data for the project detail page', funct
         'target_sloi_count' => 3,
         'enable_ikm' => false,
         'enable_sloi' => true,
-        'enable_sroi' => false,
         'sloi_template_id' => $template->id,
         'created_by' => $user->id,
     ]);

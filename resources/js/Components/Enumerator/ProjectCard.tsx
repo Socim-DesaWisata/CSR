@@ -9,7 +9,7 @@ export type ProjectStatus =
     | 'finished'
     | 'closed'
     | 'archived';
-export type ProjectType = 'IKM' | 'SLOI' | 'SROI';
+export type ProjectType = 'IKM' | 'SLOI';
 
 export interface ProjectData {
     id: string | number;
@@ -21,7 +21,6 @@ export interface ProjectData {
     endDate: string;
     enable_ikm?: boolean;
     enable_sloi?: boolean;
-    enable_sroi?: boolean;
 }
 
 interface ProjectCardProps {
@@ -32,10 +31,9 @@ interface ProjectCardProps {
     actions?: ReactNode;
 }
 
-const typeVariants: Record<ProjectType, 'blue' | 'purple' | 'amber'> = {
+const typeVariants: Record<ProjectType, 'blue' | 'purple'> = {
     IKM: 'blue',
     SLOI: 'purple',
-    SROI: 'amber',
 };
 
 const statusConfig: Record<
@@ -68,9 +66,6 @@ export default function ProjectCard({
     }
     if (project.enable_sloi) {
         enabledTypes.push('SLOI');
-    }
-    if (project.enable_sroi) {
-        enabledTypes.push('SROI');
     }
     if (enabledTypes.length === 0) {
         enabledTypes.push(project.type);

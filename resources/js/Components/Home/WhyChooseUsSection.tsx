@@ -3,7 +3,7 @@ import { BarChart3, Shield, Trophy, Users } from 'lucide-react';
 const whyChooseUs = [
     {
         icon: Trophy,
-        title: 'Metodologi SROI & IKM Teruji',
+        title: 'Metodologi IKM & SLOI Teruji',
         description:
             'Gunakan framework evaluasi yang diakui secara global untuk mengukur dampak sosial program Anda.',
     },

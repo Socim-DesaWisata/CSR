@@ -62,12 +62,4 @@ class ProjectScoreSnapshot extends Model
     {
         return $query->where('assessment_type', 'SLOI');
     }
-
-    /**
-     * Scope a query to only include SROI snapshots.
-     */
-    public function scopeSroi($query)
-    {
-        return $query->where('assessment_type', 'SROI');
-    }
 }

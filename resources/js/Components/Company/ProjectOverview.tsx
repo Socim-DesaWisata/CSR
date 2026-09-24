@@ -1,7 +1,5 @@
 import { Icon, MetricCard } from '@/Components/Company';
-import { router } from '@inertiajs/react';
-import { Pencil, Plus, Trash2, X } from 'lucide-react';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 
 // ─── Types ─────────────────────────────────────────────────
 
@@ -17,18 +15,6 @@ interface EnumeratorItem {
     email: string;
 }
 
-interface StakeholderOutcomeItem {
-    id: number;
-    stakeholderId: number;
-    outcome: string;
-}
-
-interface StakeholderItem {
-    id: number;
-    name: string;
-    outcomes: StakeholderOutcomeItem[];
-}
-
 interface ProjectData {
     id: number;
     name: string;
@@ -38,7 +24,6 @@ interface ProjectData {
     companyName: string | null;
     enableIkm: boolean;
     enableSloi: boolean;
-    enableSroi: boolean;
     targetIkmCount: number;
     targetSloiCount: number;
     startDate: string | null;
@@ -49,7 +34,6 @@ interface ProjectData {
         id: number;
         title: string;
     }[];
-    stakeholders: StakeholderItem[];
 }
 
 interface StatsData {
@@ -86,7 +70,6 @@ interface ProjectOverviewProps {
     ikmStats: IkmStatsData | null;
     sloiStats: StatsData | null;
     auditLog: AuditLogItem[];
-    canEdit?: boolean;
 }
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -127,19 +110,7 @@ export default function ProjectOverview({
     ikmStats,
     sloiStats,
     auditLog,
-    canEdit = true,
 }: ProjectOverviewProps): ReactNode {
-    const [stakeholderModal, setStakeholderModal] = useState<
-        StakeholderItem | null | false
-    >(false);
-    const [outcomeModal, setOutcomeModal] = useState<{
-        stakeholderId: number;
-        outcome?: StakeholderOutcomeItem;
-    } | null>(null);
-    const [stakeholderName, setStakeholderName] = useState('');
-    const [outcomeText, setOutcomeText] = useState('');
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    const [processing, setProcessing] = useState(false);
     const effectiveSloiStats = sloiStats ?? stats;
     const assessmentTypes = [
         {
@@ -159,81 +130,6 @@ export default function ProjectOverview({
             bg: 'bg-amber-50',
         },
     ];
-
-    const submit = (
-        method: 'post' | 'patch' | 'delete',
-        url: string,
-        data: Record<string, unknown> = {},
-        onSuccess?: () => void,
-    ) => {
-        setProcessing(true);
-        setErrors({});
-
-        const options = {
-            preserveScroll: true,
-            onSuccess: () => {
-                setProcessing(false);
-                onSuccess?.();
-            },
-            onError: (validationErrors: Record<string, string>) => {
-                setErrors(validationErrors);
-                setProcessing(false);
-            },
-            onFinish: () => setProcessing(false),
-        };
-
-        if (method === 'post') router.post(url, data as never, options);
-        if (method === 'patch') router.patch(url, data as never, options);
-        if (method === 'delete') router.delete(url, options);
-    };
-
-    const openStakeholderModal = (
-        stakeholder: StakeholderItem | null = null,
-    ) => {
-        setErrors({});
-        setStakeholderName(stakeholder?.name ?? '');
-        setStakeholderModal(stakeholder);
-    };
-
-    const openOutcomeModal = (
-        stakeholderId: number,
-        outcome?: StakeholderOutcomeItem,
-    ) => {
-        setErrors({});
-        setOutcomeText(outcome?.outcome ?? '');
-        setOutcomeModal({ stakeholderId, outcome });
-    };
-
-    const submitStakeholder = () => {
-        const stakeholder = stakeholderModal || null;
-
-        submit(
-            stakeholder ? 'patch' : 'post',
-            stakeholder
-                ? `/projects/${project.id}/stakeholders/${stakeholder.id}`
-                : `/projects/${project.id}/stakeholders`,
-            { name: stakeholderName },
-            () => setStakeholderModal(false),
-        );
-    };
-
-    const submitOutcome = () => {
-        if (!outcomeModal) return;
-
-        submit(
-            outcomeModal.outcome ? 'patch' : 'post',
-            outcomeModal.outcome
-                ? `/projects/${project.id}/stakeholder-outcomes/${outcomeModal.outcome.id}`
-                : `/projects/${project.id}/stakeholder-outcomes`,
-            outcomeModal.outcome
-                ? { outcome: outcomeText }
-                : {
-                      stakeholder_id: outcomeModal.stakeholderId,
-                      outcome: outcomeText,
-                  },
-            () => setOutcomeModal(null),
-        );
-    };
 
     return (
         <>
@@ -400,152 +296,6 @@ export default function ProjectOverview({
                             value={`${stats.totalResponses.toLocaleString()} / ${stats.targetResponses.toLocaleString()}`}
                         /> */}
                     </div>
-                </div>
-            </div>
-
-            <div className="mb-8 rounded-xl border border-slate-100 bg-white shadow-sm">
-                <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-6 py-4">
-                    <h3 className="flex items-center gap-2 text-base font-bold text-slate-900">
-                        <Icon name="groups" className="text-lg text-primary" />
-                        Stakeholder & Outcome
-                        <span className="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
-                            {project.stakeholders.length}
-                        </span>
-                    </h3>
-                    {canEdit && (
-                        <button
-                            type="button"
-                            onClick={() => openStakeholderModal()}
-                            className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition hover:bg-primary/90"
-                        >
-                            <Plus className="size-4" />
-                            Tambah Stakeholder
-                        </button>
-                    )}
-                </div>
-                <div className="p-6">
-                    {project.stakeholders.length === 0 ? (
-                        <p className="text-center text-sm text-slate-400">
-                            Belum ada stakeholder.
-                        </p>
-                    ) : (
-                        <div className="flex flex-col gap-4">
-                            {project.stakeholders.map((stakeholder) => (
-                                <div
-                                    key={stakeholder.id}
-                                    className="rounded-xl border border-slate-200 bg-slate-50/60 p-4"
-                                >
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div>
-                                            <p className="text-sm font-semibold text-slate-900">
-                                                {stakeholder.name}
-                                            </p>
-                                            <p className="mt-1 text-xs text-slate-500">
-                                                {stakeholder.outcomes.length}{' '}
-                                                outcome
-                                            </p>
-                                        </div>
-                                        {canEdit && (
-                                            <div className="flex items-center gap-2">
-                                                <MiniIconButton
-                                                    label="Edit stakeholder"
-                                                    onClick={() =>
-                                                        openStakeholderModal(
-                                                            stakeholder,
-                                                        )
-                                                    }
-                                                >
-                                                    <Pencil className="size-4" />
-                                                </MiniIconButton>
-                                                <MiniIconButton
-                                                    label="Hapus stakeholder"
-                                                    danger
-                                                    onClick={() =>
-                                                        submit(
-                                                            'delete',
-                                                            `/projects/${project.id}/stakeholders/${stakeholder.id}`,
-                                                        )
-                                                    }
-                                                >
-                                                    <Trash2 className="size-4" />
-                                                </MiniIconButton>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="mt-4 flex flex-col gap-3">
-                                        {stakeholder.outcomes.length === 0 ? (
-                                            <div className="rounded-lg border border-dashed border-slate-200 bg-white px-4 py-3 text-sm text-slate-400">
-                                                Belum ada outcome.
-                                            </div>
-                                        ) : (
-                                            stakeholder.outcomes.map(
-                                                (outcome, index) => (
-                                                    <div
-                                                        key={outcome.id}
-                                                        className="flex items-start justify-between gap-4 rounded-lg border border-slate-200 bg-white px-4 py-3"
-                                                    >
-                                                        <div className="flex min-w-0 items-start gap-3">
-                                                            <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                                                                {index + 1}
-                                                            </div>
-                                                            <p className="text-sm leading-relaxed text-slate-700">
-                                                                {
-                                                                    outcome.outcome
-                                                                }
-                                                            </p>
-                                                        </div>
-                                                        {canEdit && (
-                                                            <div className="flex items-center gap-2">
-                                                                <MiniIconButton
-                                                                    label="Edit outcome"
-                                                                    onClick={() =>
-                                                                        openOutcomeModal(
-                                                                            stakeholder.id,
-                                                                            outcome,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Pencil className="size-4" />
-                                                                </MiniIconButton>
-                                                                <MiniIconButton
-                                                                    label="Hapus outcome"
-                                                                    danger
-                                                                    onClick={() =>
-                                                                        submit(
-                                                                            'delete',
-                                                                            `/projects/${project.id}/stakeholder-outcomes/${outcome.id}`,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Trash2 className="size-4" />
-                                                                </MiniIconButton>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ),
-                                            )
-                                        )}
-
-                                        {canEdit && (
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    openOutcomeModal(
-                                                        stakeholder.id,
-                                                    )
-                                                }
-                                                className="inline-flex w-fit items-center gap-2 rounded-lg border border-dashed border-primary/30 bg-white px-3 py-2 text-sm font-medium text-primary transition hover:border-primary hover:bg-primary/5"
-                                            >
-                                                <Plus className="size-4" />
-                                                Tambah Outcome
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
                 </div>
             </div>
 
@@ -825,98 +575,6 @@ export default function ProjectOverview({
                     </table>
                 </div>
             </div> */}
-
-            {stakeholderModal !== false && (
-                <SimpleModal
-                    title={
-                        stakeholderModal
-                            ? 'Edit Stakeholder'
-                            : 'Tambah Stakeholder'
-                    }
-                    onClose={() => setStakeholderModal(false)}
-                >
-                    <div className="space-y-4">
-                        <label className="block">
-                            <span className="mb-1 block text-sm font-medium text-slate-700">
-                                Nama Stakeholder
-                            </span>
-                            <input
-                                type="text"
-                                value={stakeholderName}
-                                onChange={(event) =>
-                                    setStakeholderName(event.target.value)
-                                }
-                                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                            />
-                            {errors.name && (
-                                <ErrorText>{errors.name}</ErrorText>
-                            )}
-                        </label>
-                        <div className="flex justify-end gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setStakeholderModal(false)}
-                                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
-                            >
-                                Batal
-                            </button>
-                            <button
-                                type="button"
-                                onClick={submitStakeholder}
-                                disabled={processing}
-                                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-                            >
-                                Simpan
-                            </button>
-                        </div>
-                    </div>
-                </SimpleModal>
-            )}
-
-            {outcomeModal && (
-                <SimpleModal
-                    title={
-                        outcomeModal.outcome ? 'Edit Outcome' : 'Tambah Outcome'
-                    }
-                    onClose={() => setOutcomeModal(null)}
-                >
-                    <div className="space-y-4">
-                        <label className="block">
-                            <span className="mb-1 block text-sm font-medium text-slate-700">
-                                Outcome
-                            </span>
-                            <textarea
-                                value={outcomeText}
-                                onChange={(event) =>
-                                    setOutcomeText(event.target.value)
-                                }
-                                rows={4}
-                                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                            />
-                            {errors.outcome && (
-                                <ErrorText>{errors.outcome}</ErrorText>
-                            )}
-                        </label>
-                        <div className="flex justify-end gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setOutcomeModal(null)}
-                                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
-                            >
-                                Batal
-                            </button>
-                            <button
-                                type="button"
-                                onClick={submitOutcome}
-                                disabled={processing}
-                                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-                            >
-                                Simpan
-                            </button>
-                        </div>
-                    </div>
-                </SimpleModal>
-            )}
         </>
     );
 }
@@ -933,74 +591,5 @@ function InfoRow({ label, value }: { label: string; value: ReactNode }) {
                 {value}
             </span>
         </div>
-    );
-}
-
-function MiniIconButton({
-    children,
-    label,
-    danger = false,
-    onClick,
-}: {
-    children: ReactNode;
-    label: string;
-    danger?: boolean;
-    onClick: () => void;
-}): ReactNode {
-    return (
-        <button
-            type="button"
-            aria-label={label}
-            title={label}
-            onClick={onClick}
-            className={`flex size-8 items-center justify-center rounded-lg border transition ${
-                danger
-                    ? 'border-red-200 text-red-600 hover:bg-red-50'
-                    : 'border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800'
-            }`}
-        >
-            {children}
-        </button>
-    );
-}
-
-function SimpleModal({
-    title,
-    onClose,
-    children,
-}: {
-    title: string;
-    onClose: () => void;
-    children: ReactNode;
-}): ReactNode {
-    return (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 pt-10 backdrop-blur-sm">
-            <div
-                className="absolute inset-0"
-                aria-hidden="true"
-                onClick={onClose}
-            />
-            <div className="relative z-10 w-full max-w-lg rounded-2xl bg-white shadow-xl">
-                <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-                    <h3 className="text-base font-bold text-slate-900">
-                        {title}
-                    </h3>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="flex size-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
-                    >
-                        <X className="size-5" />
-                    </button>
-                </div>
-                <div className="p-6">{children}</div>
-            </div>
-        </div>
-    );
-}
-
-function ErrorText({ children }: { children: ReactNode }): ReactNode {
-    return (
-        <p className="mt-1 text-xs font-semibold text-red-600">{children}</p>
     );
 }

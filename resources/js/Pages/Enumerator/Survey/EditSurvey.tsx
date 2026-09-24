@@ -17,38 +17,6 @@ interface Question {
     order_no: number;
 }
 
-interface ProjectStakeholder {
-    id: number;
-    name: string;
-}
-
-interface ProjectSroiQuestion {
-    id: number;
-    sectionId: number;
-    parentQuestionId: number | null;
-    questionText: string;
-    helpText: string | null;
-    answerType: 'text' | 'number' | null;
-    unit: string | null;
-    isGroup: boolean;
-    orderNo: number;
-}
-
-interface ProjectSroiSection {
-    id: number;
-    title: string;
-    description: string | null;
-    orderNo: number;
-    questions: ProjectSroiQuestion[];
-}
-
-interface ProjectSroiForm {
-    id: number;
-    name: string;
-    description: string | null;
-    sections: ProjectSroiSection[];
-}
-
 interface Project {
     id: number;
     company_id: number;
@@ -59,7 +27,6 @@ interface Project {
 interface Respondent {
     id: number;
     name: string;
-    stakeholder_id: number | null;
     address: string | null;
     phone: string | null;
     age: number | null;
@@ -85,9 +52,6 @@ interface Props {
     respondent: Respondent;
     questions: Question[];
     answersMap: Record<string, number>;
-    projectSroiForm?: ProjectSroiForm | null;
-    projectStakeholders?: ProjectStakeholder[];
-    sroiAnswersMap?: Record<number, string>;
     descriptiveQuestions: { id: number; title: string }[];
     descriptiveAnswersMap: Record<number, string>;
 }
@@ -98,37 +62,20 @@ const steps = [
     { id: 3, label: 'Review', icon: 'rate_review' },
 ];
 
-const getSroiAnswerableQuestions = (
-    form?: ProjectSroiForm | null,
-): ProjectSroiQuestion[] =>
-    form?.sections.flatMap((section) =>
-        section.questions.filter(
-            (question) => !question.isGroup && question.answerType,
-        ),
-    ) ?? [];
-
 export default function EditSurvey({
     submission,
     project,
     respondent,
     questions,
     answersMap,
-    projectSroiForm = null,
-    projectStakeholders = [],
-    sroiAnswersMap = {},
     descriptiveQuestions,
     descriptiveAnswersMap,
 }: Props) {
     const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const isSroi = submission.assessment_type.toUpperCase() === 'SROI';
 
     const [respondentData, setRespondentData] = useState<RespondentData>({
         name: respondent.name ?? '',
-        stakeholder_id:
-            respondent.stakeholder_id != null
-                ? String(respondent.stakeholder_id)
-                : '',
         address: respondent.address ?? '',
         phone: respondent.phone ?? '',
         age: respondent.age != null ? String(respondent.age) : '',
@@ -143,8 +90,6 @@ export default function EditSurvey({
     });
 
     const [answers, setAnswers] = useState<QuestionAnswers>(answersMap);
-    const [sroiAnswers, setSroiAnswers] =
-        useState<Record<number, string>>(sroiAnswersMap);
     const [descriptiveAnswers, setDescriptiveAnswers] =
         useState<DescriptiveAnswers>(descriptiveAnswersMap);
 
@@ -155,12 +100,6 @@ export default function EditSurvey({
             submission.longitude != null ? Number(submission.longitude) : null,
         error: null,
     });
-
-    const stakeholderName =
-        projectStakeholders.find(
-            (stakeholder) =>
-                String(stakeholder.id) === respondentData.stakeholder_id,
-        )?.name ?? null;
 
     const goToStep = (step: 1 | 2 | 3) => setCurrentStep(step);
     const handleBack = () => router.visit(route('enumerator.survey.history'));
@@ -179,10 +118,6 @@ export default function EditSurvey({
         const fd = new FormData();
 
         fd.append('respondent[name]', respondentData.name);
-        fd.append(
-            'respondent[stakeholder_id]',
-            respondentData.stakeholder_id ?? '',
-        );
         fd.append('respondent[address]', respondentData.address);
         fd.append('respondent[phone]', respondentData.phone);
         fd.append('respondent[age]', respondentData.age);
@@ -215,35 +150,14 @@ export default function EditSurvey({
         );
         fd.append('assessment_type', submission.assessment_type.toUpperCase());
 
-        if (isSroi) {
-            getSroiAnswerableQuestions(projectSroiForm).forEach(
-                (question, index) => {
-                    const value = sroiAnswers[question.id] ?? '';
-                    fd.append(
-                        `sroi_answers[${index}][project_sroi_question_id]`,
-                        String(question.id),
-                    );
-
-                    if (question.answerType === 'number') {
-                        fd.append(
-                            `sroi_answers[${index}][value_number]`,
-                            value,
-                        );
-                    } else {
-                        fd.append(`sroi_answers[${index}][value_text]`, value);
-                    }
-                },
-            );
-        } else {
-            Object.entries(answers).forEach(([key, value], index) => {
-                const dashIdx = key.indexOf('-');
-                const questionId = key.substring(0, dashIdx);
-                const type = key.substring(dashIdx + 1);
-                fd.append(`answers[${index}][question_id]`, questionId);
-                fd.append(`answers[${index}][type]`, type);
-                fd.append(`answers[${index}][value]`, String(value));
-            });
-        }
+        Object.entries(answers).forEach(([key, value], index) => {
+            const dashIndex = key.indexOf('-');
+            const questionId = key.substring(0, dashIndex);
+            const type = key.substring(dashIndex + 1);
+            fd.append(`answers[${index}][question_id]`, questionId);
+            fd.append(`answers[${index}][type]`, type);
+            fd.append(`answers[${index}][value]`, String(value));
+        });
 
         Object.entries(descriptiveAnswers).forEach(([qId, answer], index) => {
             if (String(answer).trim()) {
@@ -274,46 +188,23 @@ export default function EditSurvey({
             return;
         }
 
-        if (isSroi) {
-            const requiredQuestions =
-                getSroiAnswerableQuestions(projectSroiForm);
+        const isIKM = submission.assessment_type.toUpperCase() === 'IKM';
+        const totalRequired = isIKM
+            ? questions.reduce(
+                  (acc, question) =>
+                      acc +
+                      (question.category === 'ikm-kepentingan' ||
+                      question.category === 'ikm-kinerja'
+                          ? 1
+                          : 2),
+                  0,
+              )
+            : questions.length;
 
-            if (!respondentData.stakeholder_id) {
-                alert('Stakeholder wajib dipilih untuk survei SROI.');
-                goToStep(1);
-                return;
-            }
-
-            if (
-                requiredQuestions.length === 0 ||
-                requiredQuestions.some(
-                    (question) =>
-                        !String(sroiAnswers[question.id] ?? '').trim(),
-                )
-            ) {
-                alert('Semua pertanyaan SROI harus dijawab sebelum menyimpan.');
-                goToStep(2);
-                return;
-            }
-        } else {
-            const isIKM = submission.assessment_type.toUpperCase() === 'IKM';
-            const totalRequired = isIKM
-                ? questions.reduce(
-                      (acc, q) =>
-                          acc +
-                          (q.category === 'ikm-kepentingan' ||
-                          q.category === 'ikm-kinerja'
-                              ? 1
-                              : 2),
-                      0,
-                  )
-                : questions.length;
-
-            if (Object.keys(answers).length < totalRequired) {
-                alert('Semua pertanyaan harus dijawab sebelum menyimpan.');
-                goToStep(2);
-                return;
-            }
+        if (Object.keys(answers).length < totalRequired) {
+            alert('Semua pertanyaan harus dijawab sebelum menyimpan.');
+            goToStep(2);
+            return;
         }
 
         setIsSubmitting(true);
@@ -402,13 +293,6 @@ export default function EditSurvey({
             {currentStep === 1 && (
                 <RespondentForm
                     data={respondentData}
-                    isSroi={isSroi}
-                    stakeholderOptions={projectStakeholders.map(
-                        (stakeholder) => ({
-                            value: String(stakeholder.id),
-                            label: stakeholder.name,
-                        }),
-                    )}
                     onChange={setRespondentData}
                     onBack={handleBack}
                     onNext={() => goToStep(2)}
@@ -426,9 +310,6 @@ export default function EditSurvey({
                     descriptiveQuestions={descriptiveQuestions}
                     descriptiveAnswers={descriptiveAnswers}
                     onDescriptiveChange={setDescriptiveAnswers}
-                    projectSroiForm={projectSroiForm}
-                    sroiAnswers={sroiAnswers}
-                    onSroiChange={setSroiAnswers}
                     onBack={() => goToStep(1)}
                     onNext={() => goToStep(3)}
                     onClose={handleCloseQuestionnaire}
@@ -441,10 +322,6 @@ export default function EditSurvey({
                     respondentData={respondentData}
                     answers={answers}
                     questions={questions}
-                    surveyType={submission.assessment_type}
-                    projectSroiForm={projectSroiForm}
-                    sroiAnswers={sroiAnswers}
-                    stakeholderName={stakeholderName}
                     gpsLocation={gpsLocation}
                     existingPhotoUrl={submission.photo_url}
                     onBack={() => goToStep(2)}

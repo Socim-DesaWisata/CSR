@@ -12,7 +12,6 @@ export function SubmissionTypeChart({ data }: SubmissionTypeChartProps) {
     const colors: Record<string, string> = {
         IKM: 'bg-emerald-500',
         SLOI: 'bg-blue-500',
-        SROI: 'bg-amber-500',
     };
 
     return (

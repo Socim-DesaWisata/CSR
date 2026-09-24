@@ -8030,18 +8030,12 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (12, '2026_01_25_000009_create_project_locations_table', 1),
 (13, '2026_01_25_000010_create_project_enumerator_assignments_table', 1),
 (14, '2026_01_25_000011_create_respondents_table', 1),
-(15, '2026_01_25_000012_create_sroi_questions_table', 1),
 (16, '2026_01_25_000013_create_submissions_table', 1),
 (17, '2026_01_25_000014_create_submission_template_answers_table', 1),
-(18, '2026_01_25_000015_create_submission_sroi_answers_table', 1),
 (19, '2026_01_25_000016_create_project_score_snapshots_table', 1),
 (20, '2026_03_07_000001_create_submission_timelines_table', 1),
 (21, '2026_04_04_055006_create_project_descriptive_questions_table', 1),
-(22, '2026_04_04_055010_create_submission_descriptive_answers_table', 1),
-(23, '2026_01_25_000010_1_create_project_stakeholders_table', 2),
-(24, '2026_01_25_000010_2_create_stakeholder_outcomes_table', 2),
-(25, '2026_06_21_184122_create_project_stakeholders_table', 2),
-(26, '2026_06_21_184122_create_stakeholder_outcomes_table', 2);
+(22, '2026_04_04_055010_create_submission_descriptive_answers_table', 1);
 
 -- --------------------------------------------------------
 
@@ -8072,7 +8066,6 @@ CREATE TABLE `projects` (
   `target_sloi_count` int(11) NOT NULL DEFAULT 0,
   `enable_ikm` tinyint(1) NOT NULL DEFAULT 0,
   `enable_sloi` tinyint(1) NOT NULL DEFAULT 0,
-  `enable_sroi` tinyint(1) NOT NULL DEFAULT 0,
   `ikm_template_id` bigint(20) UNSIGNED DEFAULT NULL,
   `sloi_template_id` bigint(20) UNSIGNED DEFAULT NULL,
   `start_date` date DEFAULT NULL,
@@ -8088,14 +8081,14 @@ CREATE TABLE `projects` (
 -- Dumping data for table `projects`
 --
 
-INSERT INTO `projects` (`id`, `company_id`, `name`, `description`, `project_code`, `status`, `target_ikm_count`, `target_sloi_count`, `enable_ikm`, `enable_sloi`, `enable_sroi`, `ikm_template_id`, `sloi_template_id`, `start_date`, `end_date`, `closed_at`, `created_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, 'Program CSR Desa Makmur 2026', 'Program pemberdayaan masyarakat desa melalui kegiatan CSR untuk meningkatkan kesejahteraan dan kepuasan masyarakat.', 'PROJ-MJB001', 'active', 15, 10, 1, 1, 0, 1, 2, '2026-01-01', '2026-12-31', NULL, 3, '2026-04-22 11:01:22', '2026-04-22 11:01:22', NULL),
-(2, 1, 'Program Bank Sampah', 'Program bank sampah kecamatan mulyosari', 'OY1DXE', 'active', 20, 30, 1, 1, 0, 1, 2, '2026-04-24', '2026-05-08', NULL, 3, '2026-04-24 02:02:18', '2026-04-24 02:02:26', NULL),
-(3, 1, 'Pelindo Creative Hub', 'ajskhdhaksjhd', 'W56PPB', 'active', 50, 50, 1, 1, 0, 1, 2, '2026-04-24', '2026-05-09', NULL, 3, '2026-04-24 02:30:58', '2026-04-24 02:33:21', NULL),
-(4, 4, 'Program MNP Makassar', 'Pemberdayaan masyarakat di Kota Makassar', 'WOGEBE', 'active', 0, 50, 0, 1, 0, NULL, 2, '2026-06-21', '2026-06-30', NULL, 13, '2026-06-22 03:07:26', '2026-06-22 03:53:54', NULL),
-(5, 4, 'Program MNP Makassar', 'Program Pemberdayaan Masyarakat', '1CCAJ1', 'active', 50, 0, 1, 0, 0, 1, NULL, '2026-06-22', '2026-06-30', NULL, 13, '2026-06-22 04:12:32', '2026-06-22 04:13:25', NULL),
-(6, 5, 'EQUIP 2024-2025', 'Project EQUIP pilar pendidikan PT Sumbawa Timur Mining', 'OB3H8A', 'active', 50, 50, 1, 1, 0, 1, 2, '2026-06-30', '2026-07-10', NULL, 18, '2026-06-30 01:51:34', '2026-06-30 02:04:59', NULL),
-(7, 5, 'Air Bersih di Lepadi', 'Air bersih', 'VH3UBL', 'active', 50, 50, 1, 1, 0, 1, 2, '2026-06-30', '2026-07-10', NULL, 18, '2026-06-30 04:50:57', '2026-06-30 04:51:02', NULL);
+INSERT INTO `projects` (`id`, `company_id`, `name`, `description`, `project_code`, `status`, `target_ikm_count`, `target_sloi_count`, `enable_ikm`, `enable_sloi`, `ikm_template_id`, `sloi_template_id`, `start_date`, `end_date`, `closed_at`, `created_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'Program CSR Desa Makmur 2026', 'Program pemberdayaan masyarakat desa melalui kegiatan CSR untuk meningkatkan kesejahteraan dan kepuasan masyarakat.', 'PROJ-MJB001', 'active', 15, 10, 1, 1, 1, 2, '2026-01-01', '2026-12-31', NULL, 3, '2026-04-22 11:01:22', '2026-04-22 11:01:22', NULL),
+(2, 1, 'Program Bank Sampah', 'Program bank sampah kecamatan mulyosari', 'OY1DXE', 'active', 20, 30, 1, 1, 1, 2, '2026-04-24', '2026-05-08', NULL, 3, '2026-04-24 02:02:18', '2026-04-24 02:02:26', NULL),
+(3, 1, 'Pelindo Creative Hub', 'ajskhdhaksjhd', 'W56PPB', 'active', 50, 50, 1, 1, 1, 2, '2026-04-24', '2026-05-09', NULL, 3, '2026-04-24 02:30:58', '2026-04-24 02:33:21', NULL),
+(4, 4, 'Program MNP Makassar', 'Pemberdayaan masyarakat di Kota Makassar', 'WOGEBE', 'active', 0, 50, 0, 1, NULL, 2, '2026-06-21', '2026-06-30', NULL, 13, '2026-06-22 03:07:26', '2026-06-22 03:53:54', NULL),
+(5, 4, 'Program MNP Makassar', 'Program Pemberdayaan Masyarakat', '1CCAJ1', 'active', 50, 0, 1, 0, 1, NULL, '2026-06-22', '2026-06-30', NULL, 13, '2026-06-22 04:12:32', '2026-06-22 04:13:25', NULL),
+(6, 5, 'EQUIP 2024-2025', 'Project EQUIP pilar pendidikan PT Sumbawa Timur Mining', 'OB3H8A', 'active', 50, 50, 1, 1, 1, 2, '2026-06-30', '2026-07-10', NULL, 18, '2026-06-30 01:51:34', '2026-06-30 02:04:59', NULL),
+(7, 5, 'Air Bersih di Lepadi', 'Air bersih', 'VH3UBL', 'active', 50, 50, 1, 1, 1, 2, '2026-06-30', '2026-07-10', NULL, 18, '2026-06-30 04:50:57', '2026-06-30 04:51:02', NULL);
 
 -- --------------------------------------------------------
 
@@ -8311,7 +8304,7 @@ CREATE TABLE `project_score_snapshots` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `company_id` bigint(20) UNSIGNED NOT NULL,
   `project_id` bigint(20) UNSIGNED NOT NULL,
-  `assessment_type` varchar(10) NOT NULL COMMENT 'IKM|SLOI|SROI',
+  `assessment_type` varchar(10) NOT NULL COMMENT 'IKM|SLOI',
   `calculated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `total_score` decimal(12,4) NOT NULL DEFAULT 0.0000,
   `details_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`details_json`)),
@@ -8321,18 +8314,6 @@ CREATE TABLE `project_score_snapshots` (
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `project_stakeholders`
---
-
-CREATE TABLE `project_stakeholders` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `project_id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -8556,39 +8537,9 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `sroi_questions`
---
-
-CREATE TABLE `sroi_questions` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `company_id` bigint(20) UNSIGNED NOT NULL,
-  `project_id` bigint(20) UNSIGNED NOT NULL,
-  `code` varchar(50) DEFAULT NULL,
-  `question_text` text NOT NULL,
-  `answer_type` varchar(20) NOT NULL COMMENT 'text|likert_1_5',
-  `required` tinyint(1) NOT NULL DEFAULT 1,
-  `weight` decimal(6,3) NOT NULL DEFAULT 1.000,
-  `order_no` int(11) NOT NULL DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `stakeholder_outcomes`
---
-
-CREATE TABLE `stakeholder_outcomes` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `stakeholder_id` bigint(20) UNSIGNED NOT NULL,
-  `outcome` text NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -8600,7 +8551,7 @@ CREATE TABLE `submissions` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `company_id` bigint(20) UNSIGNED NOT NULL,
   `project_id` bigint(20) UNSIGNED NOT NULL,
-  `assessment_type` varchar(10) NOT NULL COMMENT 'IKM|SLOI|SROI',
+  `assessment_type` varchar(10) NOT NULL COMMENT 'IKM|SLOI',
   `respondent_id` bigint(20) UNSIGNED DEFAULT NULL,
   `enumerator_id` bigint(20) UNSIGNED NOT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'submitted' COMMENT 'submitted|approved|rejected',
@@ -8833,19 +8784,6 @@ INSERT INTO `submission_descriptive_answers` (`id`, `submission_id`, `project_de
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `submission_sroi_answers`
---
-
-CREATE TABLE `submission_sroi_answers` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `submission_id` bigint(20) UNSIGNED NOT NULL,
-  `sroi_question_id` bigint(20) UNSIGNED NOT NULL,
-  `value_number` int(11) DEFAULT NULL,
-  `value_text` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -11278,12 +11216,6 @@ ALTER TABLE `project_score_snapshots`
   ADD KEY `project_score_snapshots_company_id_foreign` (`company_id`),
   ADD KEY `project_score_snapshots_project_id_foreign` (`project_id`);
 
---
--- Indexes for table `project_stakeholders`
---
-ALTER TABLE `project_stakeholders`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `project_stakeholders_project_id_foreign` (`project_id`);
 
 --
 -- Indexes for table `provinces`
@@ -11310,21 +11242,7 @@ ALTER TABLE `sessions`
   ADD KEY `sessions_user_id_index` (`user_id`),
   ADD KEY `sessions_last_activity_index` (`last_activity`);
 
---
--- Indexes for table `sroi_questions`
---
-ALTER TABLE `sroi_questions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `sroi_questions_company_id_foreign` (`company_id`),
-  ADD KEY `sroi_questions_project_id_order_no_index` (`project_id`,`order_no`),
-  ADD KEY `sroi_questions_project_id_code_index` (`project_id`,`code`);
 
---
--- Indexes for table `stakeholder_outcomes`
---
-ALTER TABLE `stakeholder_outcomes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `stakeholder_outcomes_stakeholder_id_foreign` (`stakeholder_id`);
 
 --
 -- Indexes for table `submissions`
@@ -11346,13 +11264,6 @@ ALTER TABLE `submission_descriptive_answers`
   ADD KEY `submission_descriptive_answers_submission_id_foreign` (`submission_id`),
   ADD KEY `sda_pdq_fk` (`project_descriptive_question_id`);
 
---
--- Indexes for table `submission_sroi_answers`
---
-ALTER TABLE `submission_sroi_answers`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `sub_sroi_ans_del_unique` (`submission_id`,`sroi_question_id`,`deleted_at`),
-  ADD KEY `submission_sroi_answers_sroi_question_id_foreign` (`sroi_question_id`);
 
 --
 -- Indexes for table `submission_template_answers`
@@ -11470,11 +11381,6 @@ ALTER TABLE `project_locations`
 ALTER TABLE `project_score_snapshots`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
---
--- AUTO_INCREMENT for table `project_stakeholders`
---
-ALTER TABLE `project_stakeholders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `provinces`
@@ -11488,17 +11394,7 @@ ALTER TABLE `provinces`
 ALTER TABLE `respondents`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
---
--- AUTO_INCREMENT for table `sroi_questions`
---
-ALTER TABLE `sroi_questions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
---
--- AUTO_INCREMENT for table `stakeholder_outcomes`
---
-ALTER TABLE `stakeholder_outcomes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `submissions`
@@ -11512,11 +11408,6 @@ ALTER TABLE `submissions`
 ALTER TABLE `submission_descriptive_answers`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
 
---
--- AUTO_INCREMENT for table `submission_sroi_answers`
---
-ALTER TABLE `submission_sroi_answers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `submission_template_answers`
@@ -11608,11 +11499,6 @@ ALTER TABLE `project_score_snapshots`
   ADD CONSTRAINT `project_score_snapshots_company_id_foreign` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `project_score_snapshots_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE;
 
---
--- Constraints for table `project_stakeholders`
---
-ALTER TABLE `project_stakeholders`
-  ADD CONSTRAINT `project_stakeholders_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `respondents`
@@ -11622,18 +11508,7 @@ ALTER TABLE `respondents`
   ADD CONSTRAINT `respondents_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `respondents_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE;
 
---
--- Constraints for table `sroi_questions`
---
-ALTER TABLE `sroi_questions`
-  ADD CONSTRAINT `sroi_questions_company_id_foreign` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `sroi_questions_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE;
 
---
--- Constraints for table `stakeholder_outcomes`
---
-ALTER TABLE `stakeholder_outcomes`
-  ADD CONSTRAINT `stakeholder_outcomes_stakeholder_id_foreign` FOREIGN KEY (`stakeholder_id`) REFERENCES `project_stakeholders` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `submissions`
@@ -11651,12 +11526,6 @@ ALTER TABLE `submission_descriptive_answers`
   ADD CONSTRAINT `sda_pdq_fk` FOREIGN KEY (`project_descriptive_question_id`) REFERENCES `project_descriptive_questions` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `submission_descriptive_answers_submission_id_foreign` FOREIGN KEY (`submission_id`) REFERENCES `submissions` (`id`) ON DELETE CASCADE;
 
---
--- Constraints for table `submission_sroi_answers`
---
-ALTER TABLE `submission_sroi_answers`
-  ADD CONSTRAINT `submission_sroi_answers_sroi_question_id_foreign` FOREIGN KEY (`sroi_question_id`) REFERENCES `sroi_questions` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `submission_sroi_answers_submission_id_foreign` FOREIGN KEY (`submission_id`) REFERENCES `submissions` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `submission_template_answers`

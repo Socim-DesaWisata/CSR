@@ -25,7 +25,6 @@ beforeEach(function () {
         'status' => 'active',
         'enable_ikm' => true,
         'enable_sloi' => false,
-        'enable_sroi' => false,
         'target_ikm_count' => 100,
         'target_sloi_count' => 0,
         'created_by' => $this->user->id,

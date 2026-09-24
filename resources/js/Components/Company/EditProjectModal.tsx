@@ -19,7 +19,6 @@ export interface EditProjectData {
     endDate: string;
     enable_ikm: boolean;
     enable_sloi: boolean;
-    enable_sroi: boolean;
     ikm_template_id: number | null;
     sloi_template_id: number | null;
     locations: LocationEntry[];
@@ -55,7 +54,6 @@ export default function EditProjectModal({
         end_date: '',
         enable_ikm: false,
         enable_sloi: false,
-        enable_sroi: false,
         ikm_template_id: null,
         sloi_template_id: null,
         district_ids: [],
@@ -77,7 +75,6 @@ export default function EditProjectModal({
                 end_date: project.endDate || '',
                 enable_ikm: project.enable_ikm || false,
                 enable_sloi: project.enable_sloi || false,
-                enable_sroi: project.enable_sroi || false,
                 ikm_template_id: project.ikm_template_id,
                 sloi_template_id: project.sloi_template_id,
                 district_ids: project.locations.map((l) => l.district.id),
@@ -147,9 +144,9 @@ export default function EditProjectModal({
         }
 
         // Validate at least one assessment type is enabled
-        if (!data.enable_ikm && !data.enable_sloi && !data.enable_sroi) {
+        if (!data.enable_ikm && !data.enable_sloi) {
             newErrors.enable_ikm =
-                'Minimal harus memilih 1 jenis penilaian (IKM, SLOI, atau SROI)';
+                'Minimal harus memilih 1 jenis penilaian (IKM atau SLOI)';
         }
 
         setErrors(newErrors);

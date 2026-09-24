@@ -170,37 +170,6 @@ export default function ProjectVerificationModal({
                                     </div>
                                 </label>
                             )}
-
-                            {/* Option SROI */}
-                            {project?.enable_sroi && (
-                                <label className="group relative cursor-pointer">
-                                    <input
-                                        className="peer sr-only"
-                                        name="survey_type"
-                                        type="radio"
-                                        value="SROI"
-                                        checked={surveyType === 'SROI'}
-                                        onChange={() => setSurveyType('SROI')}
-                                    />
-                                    <div className="flex h-full flex-col items-start rounded-xl border border-gray-200 bg-gray-50 p-4 transition-all duration-200 hover:border-primary/50 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:ring-1 peer-checked:ring-primary">
-                                        <div className="mb-2 flex w-full items-center justify-between">
-                                            <MaterialIcon
-                                                name="monitoring"
-                                                className="text-primary"
-                                            />
-                                            <div className="flex size-4 items-center justify-center rounded-full border border-gray-400 group-has-[:checked]:border-primary group-has-[:checked]:bg-primary">
-                                                <div className="size-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100" />
-                                            </div>
-                                        </div>
-                                        <span className="mb-1 text-base font-bold text-gray-900">
-                                            SROI
-                                        </span>
-                                        <span className="text-xs leading-tight text-gray-500">
-                                            Social Return on Investment
-                                        </span>
-                                    </div>
-                                </label>
-                            )}
                         </div>
                     </div>
 

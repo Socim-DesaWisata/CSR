@@ -28,33 +28,6 @@ interface DescriptiveQuestion {
     title: string;
 }
 
-interface SroiQuestion {
-    id: number;
-    sectionId: number;
-    parentQuestionId: number | null;
-    questionText: string;
-    helpText: string | null;
-    answerType: 'text' | 'number' | null;
-    unit: string | null;
-    isGroup: boolean;
-    orderNo: number;
-}
-
-interface SroiSection {
-    id: number;
-    title: string;
-    description: string | null;
-    orderNo: number;
-    questions: SroiQuestion[];
-}
-
-interface SroiForm {
-    id: number;
-    name: string;
-    description: string | null;
-    sections: SroiSection[];
-}
-
 interface QuestionFormProps {
     questions: Question[];
     projectName?: string;
@@ -68,9 +41,6 @@ interface QuestionFormProps {
     onBack: () => void;
     onNext: () => void;
     onClose: () => void;
-    projectSroiForm?: SroiForm | null;
-    sroiAnswers?: Record<number, string>;
-    onSroiChange?: (answers: Record<number, string>) => void;
 }
 
 const IKM_LABELS: {
@@ -96,167 +66,8 @@ export default function QuestionForm({
     onBack,
     onNext,
     onClose,
-    projectSroiForm = null,
-    sroiAnswers = {},
-    onSroiChange,
 }: QuestionFormProps) {
     const isIKM = surveyType.toUpperCase() === 'IKM';
-    const isSROI = surveyType.toUpperCase() === 'SROI';
-
-    if (isSROI && projectSroiForm) {
-        const orderedSections = [...projectSroiForm.sections].sort(
-            (left, right) => left.orderNo - right.orderNo || left.id - right.id,
-        );
-        const totalRequired = orderedSections.reduce(
-            (total, section) =>
-                total +
-                section.questions.filter(
-                    (question) => !question.isGroup && question.answerType,
-                ).length,
-            0,
-        );
-        const progressPercentage =
-            totalRequired === 0
-                ? 0
-                : Math.round(
-                      (Object.keys(sroiAnswers).length / totalRequired) * 100,
-                  );
-        const isComplete = Object.keys(sroiAnswers).length === totalRequired;
-
-        const questionsByParent = (questions: SroiQuestion[]) =>
-            questions.reduce<Map<number | null, SroiQuestion[]>>(
-                (map, question) => {
-                    const key = question.parentQuestionId ?? null;
-                    map.set(key, [...(map.get(key) ?? []), question]);
-                    return map;
-                },
-                new Map(),
-            );
-
-        const renderQuestionTree = (
-            question: SroiQuestion,
-            map: Map<number | null, SroiQuestion[]>,
-            depth = 0,
-        ): React.ReactNode => {
-            const children = map.get(question.id) ?? [];
-            const paddingClass =
-                depth === 0 ? 'pl-0' : depth === 1 ? 'pl-4' : 'pl-8';
-            const answerId = question.id;
-
-            return (
-                <div key={question.id} className={`space-y-3 ${paddingClass}`}>
-                    <div className="rounded-xl border border-slate-200 bg-white p-4">
-                        <p className="text-sm font-semibold text-slate-900">
-                            {question.questionText}
-                        </p>
-                        {question.helpText && (
-                            <p className="mt-1 text-sm text-slate-500">
-                                {question.helpText}
-                            </p>
-                        )}
-
-                        {!question.isGroup && question.answerType && (
-                            <div className="mt-3">
-                                {question.answerType === 'text' ? (
-                                    <textarea
-                                        rows={4}
-                                        value={sroiAnswers[answerId] ?? ''}
-                                        onChange={(event) =>
-                                            onSroiChange?.({
-                                                ...sroiAnswers,
-                                                [answerId]: event.target.value,
-                                            })
-                                        }
-                                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
-                                        placeholder="Tulis jawaban..."
-                                    />
-                                ) : (
-                                    <input
-                                        type="number"
-                                        value={sroiAnswers[answerId] ?? ''}
-                                        onChange={(event) =>
-                                            onSroiChange?.({
-                                                ...sroiAnswers,
-                                                [answerId]: event.target.value,
-                                            })
-                                        }
-                                        className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
-                                        placeholder={question.unit ?? '0'}
-                                    />
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {children.length > 0 && (
-                        <div className="space-y-3">
-                            {children
-                                .sort(
-                                    (left, right) =>
-                                        left.orderNo - right.orderNo ||
-                                        left.id - right.id,
-                                )
-                                .map((child) =>
-                                    renderQuestionTree(child, map, depth + 1),
-                                )}
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        return (
-            <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-8">
-                <SurveyHeader
-                    title="Survei SROI"
-                    subtitle="Publik &amp; Masyarakat"
-                    onClose={onClose}
-                />
-                <SurveyProgressCard
-                    percentage={progressPercentage}
-                    title="Kelengkapan Survei"
-                    description="Lengkapi seluruh section dan pertanyaan SROI berikut."
-                />
-                <div className="flex flex-col gap-4">
-                    {orderedSections.map((section) => {
-                        const map = questionsByParent(section.questions);
-                        const roots = map.get(null) ?? [];
-
-                        return (
-                            <div
-                                key={section.id}
-                                className="rounded-xl border border-slate-200 bg-slate-50 p-4"
-                            >
-                                <div className="mb-3">
-                                    <h3 className="text-base font-bold text-slate-900">
-                                        {section.title}
-                                    </h3>
-                                    {section.description && (
-                                        <p className="mt-1 text-sm text-slate-600">
-                                            {section.description}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="space-y-4">
-                                    {roots.map((question) =>
-                                        renderQuestionTree(question, map),
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-                <SurveyFooter
-                    onBack={onBack}
-                    onSubmit={onNext}
-                    backLabel="Kembali"
-                    submitLabel="Review Jawaban"
-                    submitIcon="rate_review"
-                    isSubmitDisabled={!isComplete}
-                />
-            </div>
-        );
-    }
 
     const totalRequired = useMemo(() => {
         if (!isIKM) return questions.length;

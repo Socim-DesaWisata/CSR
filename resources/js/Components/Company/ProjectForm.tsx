@@ -51,7 +51,6 @@ export interface ProjectFormData {
     end_date: string;
     enable_ikm: boolean;
     enable_sloi: boolean;
-    enable_sroi: boolean;
     ikm_template_id: number | null;
     sloi_template_id: number | null;
     district_ids: number[];
@@ -187,8 +186,6 @@ export default function ProjectForm({
             if (!checked) {
                 setData('target_sloi_count', 0);
             }
-        } else if (typeId === 'sroi') {
-            setData('enable_sroi', checked);
         }
 
         // Clear error saat checkbox berubah
@@ -310,7 +307,7 @@ export default function ProjectForm({
                         (Pilih satu atau lebih)
                     </span>
                 </label>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {assessmentTypes.map((type) => (
                         <AssessmentTypeCard
                             key={type.id}
@@ -321,15 +318,11 @@ export default function ProjectForm({
                             checked={
                                 type.id === 'ikm'
                                     ? data.enable_ikm
-                                    : type.id === 'sloi'
-                                      ? data.enable_sloi
-                                      : data.enable_sroi
+                                    : data.enable_sloi
                             }
                             onChange={(checked) =>
                                 handleAssessmentTypeChange(type.id, checked)
                             }
-                            disabled={type.id === 'sroi'}
-                            comingSoon={type.id === 'sroi'}
                         />
                     ))}
                 </div>

@@ -7,7 +7,6 @@ import ikmData from './ikmData.json';
 import projectDetailData from './projectDetail.json';
 import projectsData from './projects.json';
 import sloiData from './sloiData.json';
-import sroiData from './sroiData.json';
 
 // Export all data
 export {
@@ -16,7 +15,6 @@ export {
     projectDetailData,
     projectsData,
     sloiData,
-    sroiData,
 };
 
 // Types untuk data
@@ -24,7 +22,7 @@ export interface Project {
     id: string;
     code: string;
     name: string;
-    type: 'IKM' | 'SLOI' | 'SROI';
+    type: 'IKM' | 'SLOI';
     typeLabel: string;
     location: string;
     status: 'active' | 'draft' | 'closed';
@@ -43,7 +41,6 @@ export interface ProjectDetail {
     ikmTrend: string;
     sloiLevel: string;
     sloiProgress: number;
-    sroiRatio: string;
 }
 
 export interface Submission {
@@ -73,16 +70,6 @@ export interface SLOIAuditLog {
     status: 'verified' | 'pending';
     respondentName: string;
     enumerator: string;
-}
-
-export interface SROIOutcome {
-    id: string;
-    name: string;
-    value: number;
-    valueFormatted: string;
-    type: 'financial' | 'social' | 'environmental';
-    description: string;
-    beneficiaries: number;
 }
 
 export interface AssessmentType {

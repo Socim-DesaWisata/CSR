@@ -1,17 +1,6 @@
 {
     "projects": [
         {
-            "id": "1",
-            "code": "SROI-24-082",
-            "name": "Inisiatif Pertanian Berkelanjutan",
-            "type": "SROI",
-            "typeLabel": "Social Return on Investment (SROI)",
-            "location": "Penilaian Q3",
-            "status": "active",
-            "currentResponses": 842,
-            "targetResponses": 1200
-        },
-        {
             "id": "2",
             "code": "IKM-24-015",
             "name": "Audit Kesehatan Masyarakat",
@@ -43,17 +32,6 @@
             "status": "closed",
             "currentResponses": 2104,
             "targetResponses": 2000
-        },
-        {
-            "id": "5",
-            "code": "SROI-24-099",
-            "name": "Program Pemberdayaan Ekonomi Desa",
-            "type": "SROI",
-            "typeLabel": "Social Return on Investment (SROI)",
-            "location": "Kabupaten Sleman",
-            "status": "active",
-            "currentResponses": 567,
-            "targetResponses": 800
         },
         {
             "id": "6",

@@ -18,7 +18,6 @@ export default function CreateProject() {
         end_date: '',
         enable_ikm: false,
         enable_sloi: false,
-        enable_sroi: false,
         ikm_template_id: null as number | null,
         sloi_template_id: null as number | null,
         district_ids: [] as number[],
@@ -26,12 +25,7 @@ export default function CreateProject() {
     });
 
     const handleSubmit = () => {
-        // Validasi target hanya wajib jika project tidak memakai SROI.
-        if (
-            !data.enable_sroi &&
-            data.target_ikm_count === 0 &&
-            data.target_sloi_count === 0
-        ) {
+        if (data.target_ikm_count === 0 && data.target_sloi_count === 0) {
             setTargetError(
                 'Target responden tidak boleh 0. Harap isi minimal salah satu target (IKM atau SLOI).',
             );

@@ -9,8 +9,7 @@
         "ikmScore": 84.5,
         "ikmTrend": "+2.4%",
         "sloiLevel": "High Approval",
-        "sloiProgress": 3,
-        "sroiRatio": "1 : 3.2"
+        "sloiProgress": 3
     },
     "tabs": [
         {
@@ -27,11 +26,6 @@
             "key": "sloi",
             "label": "SLOI",
             "icon": "verified_user"
-        },
-        {
-            "key": "sroi",
-            "label": "SROI",
-            "icon": "account_balance_wallet"
         }
     ],
     "submissions": [

@@ -10,7 +10,6 @@ use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\InstrumentTemplateController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\ProjectSroiFormController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -28,8 +27,6 @@ Route::get('/', function () {
 
 Route::prefix('enumerator')->middleware('auth')->name('enumerator.')->group(function () {
     Route::get('/list', [EnumeratorProjectController::class, 'listProjectPage'])->name('list-survey');
-    Route::get('/sroi', [EnumeratorProjectController::class, 'listSroiPage'])->name('sroi.index');
-    Route::get('/sroi/{project}/data', [EnumeratorProjectController::class, 'dataSroiPage'])->name('sroi.data');
     Route::get('/survey/respondent/{projectId}', [EnumeratorSurveyController::class, 'surveyRespondentPage'])->name('survey.respondent');
     Route::post('/survey/respondent/{projectId}/store', [EnumeratorSurveyController::class, 'storeDataSurvey'])->name('survey.store');
     Route::get('/survey/history', [EnumeratorSurveyController::class, 'historyPage'])->name('survey.history');
@@ -66,24 +63,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/projects/{id}', [ProjectController::class, 'updateProject'])->name('projects.update');
     Route::patch('/projects/{id}', [ProjectController::class, 'patchProject'])->name('projects.patch');
     Route::patch('/projects/{id}/status', [ProjectController::class, 'updateStatus'])->name('projects.update-status');
-    Route::post('/projects/{id}/stakeholders', [ProjectController::class, 'storeStakeholder'])->name('projects.stakeholders.store');
-    Route::patch('/projects/{id}/stakeholders/{stakeholder}', [ProjectController::class, 'updateStakeholder'])->name('projects.stakeholders.update');
-    Route::delete('/projects/{id}/stakeholders/{stakeholder}', [ProjectController::class, 'destroyStakeholder'])->name('projects.stakeholders.destroy');
-    Route::post('/projects/{id}/stakeholder-outcomes', [ProjectController::class, 'storeStakeholderOutcome'])->name('projects.stakeholder-outcomes.store');
-    Route::patch('/projects/{id}/stakeholder-outcomes/{outcome}', [ProjectController::class, 'updateStakeholderOutcome'])->name('projects.stakeholder-outcomes.update');
-    Route::delete('/projects/{id}/stakeholder-outcomes/{outcome}', [ProjectController::class, 'destroyStakeholderOutcome'])->name('projects.stakeholder-outcomes.destroy');
     Route::patch('/submissions/bulk-status', [SubmissionController::class, 'bulkUpdateStatus'])->name('submissions.bulk-status');
     Route::get('/projects/{id}/export-respondents', [ExcelController::class, 'exportRespondents'])->name('projects.export-respondents');
-    Route::get('/projects/{project}/sroi/forms/{form}/preview', [ProjectSroiFormController::class, 'preview'])->name('projects.sroi.forms.preview');
-    Route::get('/projects/{project}/sroi/submissions/{submission}/answers', [ProjectSroiFormController::class, 'answers'])->name('projects.sroi.answers.show');
-    Route::post('/projects/{project}/sroi/forms', [ProjectSroiFormController::class, 'store'])->name('projects.sroi.forms.store');
-    Route::patch('/projects/{project}/sroi/forms/{form}', [ProjectSroiFormController::class, 'update'])->name('projects.sroi.forms.update');
-    Route::post('/projects/{project}/sroi/forms/{form}/sections', [ProjectSroiFormController::class, 'storeSection'])->name('projects.sroi.sections.store');
-    Route::patch('/projects/{project}/sroi/forms/{form}/sections/{section}', [ProjectSroiFormController::class, 'updateSection'])->name('projects.sroi.sections.update');
-    Route::delete('/projects/{project}/sroi/forms/{form}/sections/{section}', [ProjectSroiFormController::class, 'destroySection'])->name('projects.sroi.sections.destroy');
-    Route::post('/projects/{project}/sroi/forms/{form}/questions', [ProjectSroiFormController::class, 'storeQuestion'])->name('projects.sroi.questions.store');
-    Route::patch('/projects/{project}/sroi/forms/{form}/questions/{question}', [ProjectSroiFormController::class, 'updateQuestion'])->name('projects.sroi.questions.update');
-    Route::delete('/projects/{project}/sroi/forms/{form}/questions/{question}', [ProjectSroiFormController::class, 'destroyQuestion'])->name('projects.sroi.questions.destroy');
     Route::get('/projects/{id}', [ProjectController::class, 'detailProject'])->name('projects.show');
     // Enumerators
     Route::get('/enumerators', [EnumeratorController::class, 'index'])->name('enumerators.index');

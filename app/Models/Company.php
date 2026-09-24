@@ -51,11 +51,6 @@ class Company extends Model
         return $this->hasMany(Submission::class);
     }
 
-    public function projectSroiForms(): HasMany
-    {
-        return $this->hasMany(ProjectSroiForm::class);
-    }
-
     /**
      * Get the project locations for the company.
      */

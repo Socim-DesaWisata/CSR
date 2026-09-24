@@ -81,16 +81,6 @@ class User extends Authenticatable
         return $this->hasMany(InstrumentTemplate::class, 'created_by');
     }
 
-    public function createdSroiTemplates(): HasMany
-    {
-        return $this->hasMany(SroiTemplate::class, 'created_by');
-    }
-
-    public function createdProjectSroiForms(): HasMany
-    {
-        return $this->hasMany(ProjectSroiForm::class, 'created_by');
-    }
-
     /**
      * Get the respondents created by this user.
      */

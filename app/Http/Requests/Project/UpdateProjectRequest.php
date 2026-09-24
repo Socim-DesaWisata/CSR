@@ -45,7 +45,7 @@ class UpdateProjectRequest extends FormRequest
             $data['sloi_template_id'] = $this->sloi_template_id ?: null;
         }
 
-        if (!empty($data)) {
+        if (! empty($data)) {
             $this->merge($data);
         }
     }
@@ -68,7 +68,6 @@ class UpdateProjectRequest extends FormRequest
             'target_sloi_count' => ['sometimes', 'nullable', 'integer', 'min:0'],
             'enable_ikm' => ['sometimes', 'boolean'],
             'enable_sloi' => ['sometimes', 'boolean'],
-            'enable_sroi' => ['sometimes', 'boolean'],
             'ikm_template_id' => ['sometimes', 'nullable', 'integer', 'exists:instrument_templates,id'],
             'sloi_template_id' => ['sometimes', 'nullable', 'integer', 'exists:instrument_templates,id'],
             'district_ids' => ['sometimes', 'array'],

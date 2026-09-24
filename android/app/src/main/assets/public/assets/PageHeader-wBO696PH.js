@@ -1,1 +1,0 @@
-import{j as e}from"./app-CB93Q8XG.js";function l({title:a,description:t}){return e.jsxs("div",{className:"flex flex-col gap-2",children:[e.jsx("h1",{className:"text-3xl font-black leading-tight tracking-[-0.033em] text-gray-900 md:text-4xl",children:a}),t&&e.jsx("p",{className:"text-base font-normal text-gray-500",children:t})]})}export{l as P};

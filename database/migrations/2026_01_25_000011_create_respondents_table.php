@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
-            $table->foreignId('stakeholder_id')->nullable()->constrained('project_stakeholders')->nullOnDelete()->comment('nullable, diisi jika assessment_type SROI');
 
             $table->string('name', 150);
             $table->text('address')->nullable();

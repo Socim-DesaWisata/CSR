@@ -40,7 +40,7 @@ export default function HeroSection() {
                 {/* <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-200 drop-shadow-md">
                                 Tingkatkan efektivitas program CSR Anda dengan
                                 platform manajemen evaluasi komprehensif. Hitung
-                                IKM, SLOI, dan SROI dalam satu dashboard
+                                IKM dan SLOI dalam satu dashboard
                                 canggih.
                             </p> */}
 

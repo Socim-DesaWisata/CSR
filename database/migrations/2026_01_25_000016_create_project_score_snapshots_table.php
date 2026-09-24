@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
-            $table->string('assessment_type', 10)->comment('IKM|SLOI|SROI');
+            $table->string('assessment_type', 10)->comment('IKM|SLOI');
             $table->timestamp('calculated_at')->useCurrent();
             $table->decimal('total_score', 12, 4)->default(0);
             $table->json('details_json')->nullable();

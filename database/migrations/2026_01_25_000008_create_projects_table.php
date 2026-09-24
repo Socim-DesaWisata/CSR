@@ -24,7 +24,6 @@ return new class extends Migration
 
             $table->boolean('enable_ikm')->default(false);
             $table->boolean('enable_sloi')->default(false);
-            $table->boolean('enable_sroi')->default(false);
 
             $table->foreignId('ikm_template_id')->nullable()->constrained('instrument_templates')->nullOnDelete();
             $table->foreignId('sloi_template_id')->nullable()->constrained('instrument_templates')->nullOnDelete();
@@ -36,7 +35,7 @@ return new class extends Migration
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->unique(['company_id', 'project_code', 'deleted_at'], 'proj_comp_code_del_unique');
             $table->index(['company_id', 'status']);
         });

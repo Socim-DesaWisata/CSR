@@ -60,7 +60,6 @@ beforeEach(function () {
         'target_sloi_count' => 1,
         'enable_ikm' => true,
         'enable_sloi' => true,
-        'enable_sroi' => false,
         'ikm_template_id' => $this->ikmTemplate->id,
         'sloi_template_id' => $this->sloiTemplate->id,
         'created_by' => $this->user->id,

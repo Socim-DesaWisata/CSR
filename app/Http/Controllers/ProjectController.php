@@ -4,19 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Company\CreateProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
-use App\Http\Requests\ProjectStakeholder\StoreProjectStakeholderRequest;
-use App\Http\Requests\ProjectStakeholder\UpdateProjectStakeholderRequest;
-use App\Http\Requests\StakeholderOutcome\StoreStakeholderOutcomeRequest;
-use App\Http\Requests\StakeholderOutcome\UpdateStakeholderOutcomeRequest;
 use App\Models\Project;
-use App\Models\ProjectStakeholder;
-use App\Models\StakeholderOutcome;
 use App\Services\AreaService;
 use App\Services\ProjectService;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -109,9 +101,6 @@ class ProjectController extends Controller
             'enumeratorList' => $data['enumeratorList'],
             'sloiReliability' => $data['sloiReliability'] ?? null,
             'sloiAspectAnalysis' => $data['sloiAspectAnalysis'] ?? null,
-            'sroiTemplates' => $data['sroiTemplates'] ?? [],
-            'projectSroiForms' => $data['projectSroiForms'] ?? [],
-            'projectSroiForm' => $data['projectSroiForm'] ?? null,
             'respondentFilters' => [
                 'enumerator' => $request->input('enumerator', ''),
                 'resp_status' => $request->input('resp_status', ''),
@@ -190,7 +179,6 @@ class ProjectController extends Controller
                 'target_sloi_count' => ['sometimes', 'nullable', 'integer', 'min:0'],
                 'enable_ikm' => ['sometimes', 'boolean'],
                 'enable_sloi' => ['sometimes', 'boolean'],
-                'enable_sroi' => ['sometimes', 'boolean'],
                 'ikm_template_id' => ['sometimes', 'nullable', 'integer', 'exists:instrument_templates,id'],
                 'sloi_template_id' => ['sometimes', 'nullable', 'integer', 'exists:instrument_templates,id'],
                 'district_ids' => ['sometimes', 'array'],
@@ -276,79 +264,5 @@ class ProjectController extends Controller
         );
 
         return redirect()->back()->with('success', 'Enumerator berhasil di-assign.');
-    }
-
-    public function storeStakeholder(StoreProjectStakeholderRequest $request, int $projectId): RedirectResponse
-    {
-        $project = $this->resolveOwnedProject($projectId);
-
-        $project->stakeholders()->create($request->validated());
-
-        return redirect()->back()->with('success', 'Stakeholder berhasil ditambahkan.');
-    }
-
-    public function updateStakeholder(UpdateProjectStakeholderRequest $request, int $projectId, ProjectStakeholder $stakeholder): RedirectResponse
-    {
-        $project = $this->resolveOwnedProject($projectId);
-        abort_if($stakeholder->project_id !== $project->id, 404);
-
-        $stakeholder->update($request->validated());
-
-        return redirect()->back()->with('success', 'Stakeholder berhasil diperbarui.');
-    }
-
-    public function destroyStakeholder(int $projectId, ProjectStakeholder $stakeholder): RedirectResponse
-    {
-        $project = $this->resolveOwnedProject($projectId);
-        abort_if($stakeholder->project_id !== $project->id, 404);
-
-        DB::transaction(function () use ($stakeholder) {
-            $stakeholder->outcomes()->delete();
-            $stakeholder->delete();
-        });
-
-        return redirect()->back()->with('success', 'Stakeholder berhasil dihapus.');
-    }
-
-    public function storeStakeholderOutcome(StoreStakeholderOutcomeRequest $request, int $projectId): RedirectResponse
-    {
-        $project = $this->resolveOwnedProject($projectId);
-        $stakeholder = $project->stakeholders()->findOrFail($request->integer('stakeholder_id'));
-
-        $stakeholder->outcomes()->create([
-            'outcome' => $request->string('outcome')->toString(),
-        ]);
-
-        return redirect()->back()->with('success', 'Outcome berhasil ditambahkan.');
-    }
-
-    public function updateStakeholderOutcome(UpdateStakeholderOutcomeRequest $request, int $projectId, StakeholderOutcome $outcome): RedirectResponse
-    {
-        $project = $this->resolveOwnedProject($projectId);
-        abort_if($outcome->stakeholder?->project_id !== $project->id, 404);
-
-        $outcome->update($request->validated());
-
-        return redirect()->back()->with('success', 'Outcome berhasil diperbarui.');
-    }
-
-    public function destroyStakeholderOutcome(int $projectId, StakeholderOutcome $outcome): RedirectResponse
-    {
-        $project = $this->resolveOwnedProject($projectId);
-        abort_if($outcome->stakeholder?->project_id !== $project->id, 404);
-
-        $outcome->delete();
-
-        return redirect()->back()->with('success', 'Outcome berhasil dihapus.');
-    }
-
-    protected function resolveOwnedProject(int $projectId): Project
-    {
-        $user = Auth::user();
-
-        return Project::query()
-            ->where('id', $projectId)
-            ->where('company_id', $user->company_id)
-            ->firstOrFail();
     }
 }

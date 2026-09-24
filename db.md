@@ -145,7 +145,6 @@ Table projects {
   target_sloi_count int [not null, default: 0]
   enable_ikm boolean [not null, default: false]
   enable_sloi boolean [not null, default: false]
-  enable_sroi boolean [not null, default: false]
   ikm_template_id bigint [ref: > instrument_templates.id]
   sloi_template_id bigint [ref: > instrument_templates.id]
   start_date date
@@ -194,7 +193,6 @@ Table respondents {
   id bigint [pk, increment]
   company_id bigint [not null, ref: > companies.id]
   project_id bigint [not null, ref: > projects.id]
-  stakeholder_id bigint [ref: > project_stakeholders.id, note: 'nullable, diisi jika assessment_type SROI']
   name varchar(150) [not null]
   address text
   phone varchar(32)
@@ -214,138 +212,19 @@ Table respondents {
   }
 }
 
-Table sroi_templates {
-  id bigint [pk, increment]
-  name varchar(150) [not null]
-  description text
-  version int [not null, default: 1]
-  is_active boolean [not null, default: true]
-  created_by bigint [ref: > users.id]
-  published_at timestamp
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp
 
-  indexes {
-    (name, version, deleted_at) [unique, name: 'sroi_template_name_ver_del_unique']
-    is_active
-  }
-}
 
-Table sroi_template_sections {
-  id bigint [pk, increment]
-  template_id bigint [not null, ref: > sroi_templates.id]
-  title varchar(255) [not null]
-  description text
-  order_no int [not null, default: 1]
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp
 
-  indexes {
-    (template_id, order_no)
-  }
-}
 
-Table sroi_template_questions {
-  id bigint [pk, increment]
-  template_id bigint [not null, ref: > sroi_templates.id]
-  section_id bigint [not null, ref: > sroi_template_sections.id]
-  parent_question_id bigint [ref: > sroi_template_questions.id]
-  code varchar(80)
-  question_text text [not null]
-  help_text text
-  answer_type varchar(10) [note: 'text|number|null. null digunakan untuk pertanyaan group/judul']
-  unit varchar(50) [note: 'contoh: rupiah_per_bulan, orang, persen, skala_1_10']
-  is_required boolean [not null, default: false]
-  is_group boolean [not null, default: false]
-  is_calculated boolean [not null, default: false]
-  order_no int [not null, default: 1]
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp
 
-  indexes {
-    (template_id, section_id, order_no)
-    parent_question_id
-  }
-}
-
-Table project_sroi_forms {
-  id bigint [pk, increment]
-  company_id bigint [not null, ref: > companies.id]
-  project_id bigint [not null, ref: > projects.id]
-  source_template_id bigint [ref: > sroi_templates.id]
-  name varchar(150) [not null]
-  description text
-  version int [not null, default: 1]
-  status varchar(20) [not null, default: 'draft', note: 'draft|active|archived']
-  created_by bigint [ref: > users.id]
-  activated_at timestamp
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp
-
-  indexes {
-    (project_id, version, deleted_at) [unique, name: 'project_sroi_form_project_ver_del_unique']
-    (company_id, status)
-    source_template_id
-  }
-}
-
-Table project_sroi_sections {
-  id bigint [pk, increment]
-  form_id bigint [not null, ref: > project_sroi_forms.id]
-  source_template_section_id bigint [ref: > sroi_template_sections.id]
-  title varchar(255) [not null]
-  description text
-  order_no int [not null, default: 1]
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp
-
-  indexes {
-    (form_id, order_no)
-    source_template_section_id
-  }
-}
-
-Table project_sroi_questions {
-  id bigint [pk, increment]
-  form_id bigint [not null, ref: > project_sroi_forms.id]
-  section_id bigint [not null, ref: > project_sroi_sections.id]
-  parent_question_id bigint [ref: > project_sroi_questions.id]
-  source_template_question_id bigint [ref: > sroi_template_questions.id]
-  code varchar(80)
-  question_text text [not null]
-  help_text text
-  answer_type varchar(10) [note: 'text|number|null. null digunakan untuk pertanyaan group/judul']
-  unit varchar(50) [note: 'contoh: rupiah_per_bulan, orang, persen, skala_1_10']
-  is_required boolean [not null, default: false]
-  is_group boolean [not null, default: false]
-  is_calculated boolean [not null, default: false]
-  is_active boolean [not null, default: true]
-  order_no int [not null, default: 1]
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp
-
-  indexes {
-    (form_id, section_id, order_no)
-    parent_question_id
-    source_template_question_id
-    is_active
-  }
-}
 
 Table submissions {
   id bigint [pk, increment]
   company_id bigint [not null, ref: > companies.id]
   project_id bigint [not null, ref: > projects.id]
-  assessment_type varchar(10) [not null, note: 'IKM|SLOI|SROI']
+  assessment_type varchar(10) [not null, note: 'IKM|SLOI']
   respondent_id bigint [ref: > respondents.id, note: 'one to one']
   enumerator_id bigint [not null, ref: > users.id]
-  project_sroi_form_id bigint [ref: > project_sroi_forms.id, note: 'diisi jika assessment_type = SROI']
   status varchar(20) [not null, default: 'submitted', note: 'submitted|approved|rejected']
   photo_path text [not null, note: 'path/url foto']
   photo_mime varchar(100)
@@ -361,7 +240,6 @@ Table submissions {
     (project_id, enumerator_id, submitted_at)
     (project_id, respondent_id)
     (project_id, respondent_id, deleted_at) [unique, name: 'sub_proj_resp_del_unique']
-    project_sroi_form_id
   }
 }
 
@@ -375,27 +253,12 @@ Table submission_template_answers {
   deleted_at timestamp
 }
 
-Table submission_sroi_answers {
-  id bigint [pk, increment]
-  submission_id bigint [not null, ref: > submissions.id]
-  project_sroi_question_id bigint [not null, ref: > project_sroi_questions.id]
-  value_text text
-  value_number decimal(18,2)
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp
-
-  indexes {
-    (submission_id, project_sroi_question_id, deleted_at) [unique, name: 'sub_sroi_answer_unique']
-    project_sroi_question_id
-  }
-}
 
 Table project_score_snapshots {
   id bigint [pk, increment]
   company_id bigint [not null, ref: > companies.id]
   project_id bigint [not null, ref: > projects.id]
-  assessment_type varchar(10) [not null, note: 'IKM|SLOI|SROI']
+  assessment_type varchar(10) [not null, note: 'IKM|SLOI']
   calculated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
   total_score decimal(12,4) [not null, default: 0]
   details_json json
@@ -431,28 +294,6 @@ Table submission_descriptive_answers {
   submission_id bigint [not null, ref: > submissions.id]
   project_descriptive_question_id bigint [not null, ref: > project_descriptive_questions.id]
   answer text [not null]
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp
-}
-
-Table project_stakeholders {
-  id bigint [pk, increment]
-
-  project_id bigint [not null, ref: > projects.id]
-
-  name varchar(255) [not null]
-
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp
-}
-
-Table stakeholder_outcomes {
-  id bigint [pk, increment]
-  stakeholder_id bigint [not null, ref: > project_stakeholders.id]
-  outcome text [not null]
-
   created_at timestamp
   updated_at timestamp
   deleted_at timestamp

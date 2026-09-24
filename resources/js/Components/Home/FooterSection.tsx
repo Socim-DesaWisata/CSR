@@ -77,7 +77,6 @@ export default function FooterSection() {
                             <ul className="mt-4 space-y-3">
                                 {[
                                     { label: 'Survey IKM', icon: Users },
-                                    { label: 'SROI', icon: Leaf },
                                     { label: 'SLOI', icon: TrendingUp },
                                     { label: 'Manajemen Data', icon: Database },
                                 ].map(({ label, icon: Icon }) => (

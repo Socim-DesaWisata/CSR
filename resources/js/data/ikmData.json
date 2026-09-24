@@ -167,7 +167,7 @@
         },
         "criticalAttention": {
             "title": "Perhatian Kritis",
-            "description": "Kecepatan proses (2.9) menurun. Ditemukan korelasi tinggi antara waktu tunggu dan skor SROI rendah."
+            "description": "Kecepatan proses (2.9) menurun dan memerlukan perhatian."
         }
     },
     "auditLog": [
@@ -193,7 +193,7 @@
             "status": "pending",
             "photoUrl": "/photos/survey-002.jpg",
             "location": {
-                "lat": -7.2580,
+                "lat": -7.258,
                 "lng": 112.7525
             }
         },
@@ -206,8 +206,8 @@
             "status": "verified",
             "photoUrl": "/photos/survey-003.jpg",
             "location": {
-                "lat": -7.2590,
-                "lng": 112.7530
+                "lat": -7.259,
+                "lng": 112.753
             }
         },
         {
@@ -232,8 +232,8 @@
             "status": "verified",
             "photoUrl": "/photos/survey-005.jpg",
             "location": {
-                "lat": -7.2570,
-                "lng": 112.7540
+                "lat": -7.257,
+                "lng": 112.754
             }
         },
         {
@@ -258,8 +258,8 @@
             "status": "verified",
             "photoUrl": "/photos/survey-007.jpg",
             "location": {
-                "lat": -7.2560,
-                "lng": 112.7550
+                "lat": -7.256,
+                "lng": 112.755
             }
         },
         {

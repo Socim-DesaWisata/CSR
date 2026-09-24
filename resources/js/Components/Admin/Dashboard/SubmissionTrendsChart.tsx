@@ -22,7 +22,6 @@ interface SubmissionTrendsChartProps {
 const areaChartConfig: ChartConfig = {
     ikm: { label: 'IKM', color: 'hsl(var(--chart-1))' },
     sloi: { label: 'SLOI', color: 'hsl(var(--chart-2))' },
-    sroi: { label: 'SROI', color: 'hsl(var(--chart-3))' },
 };
 
 export function SubmissionTrendsChart({ data }: SubmissionTrendsChartProps) {
@@ -47,10 +46,6 @@ export function SubmissionTrendsChart({ data }: SubmissionTrendsChartProps) {
                         <span className="flex items-center gap-1.5">
                             <span className="h-3 w-3 rounded-full bg-blue-500" />
                             SLOI
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                            <span className="h-3 w-3 rounded-full bg-amber-500" />
-                            SROI
                         </span>
                     </div>
                 </div>
@@ -98,24 +93,6 @@ export function SubmissionTrendsChart({ data }: SubmissionTrendsChartProps) {
                                     stopOpacity={0}
                                 />
                             </linearGradient>
-                            <linearGradient
-                                id="colorSroi"
-                                x1="0"
-                                y1="0"
-                                x2="0"
-                                y2="1"
-                            >
-                                <stop
-                                    offset="5%"
-                                    stopColor="#f59e0b"
-                                    stopOpacity={0.3}
-                                />
-                                <stop
-                                    offset="95%"
-                                    stopColor="#f59e0b"
-                                    stopOpacity={0}
-                                />
-                            </linearGradient>
                         </defs>
                         <CartesianGrid
                             strokeDasharray="3 3"
@@ -141,13 +118,6 @@ export function SubmissionTrendsChart({ data }: SubmissionTrendsChartProps) {
                             stroke="#3b82f6"
                             strokeWidth={2}
                             fill="url(#colorSloi)"
-                        />
-                        <Area
-                            type="monotone"
-                            dataKey="sroi"
-                            stroke="#f59e0b"
-                            strokeWidth={2}
-                            fill="url(#colorSroi)"
                         />
                     </AreaChart>
                 </ChartContainer>

@@ -247,7 +247,7 @@ export default function ListProject({
                         <p className="mt-2 text-slate-500">
                             {isAdminView
                                 ? 'Pantau seluruh proyek dari semua perusahaan.'
-                                : 'Pantau performa dampak sosial melalui survei IKM, SLOI, dan SROI.'}
+                                : 'Pantau performa dampak sosial melalui survei IKM dan SLOI.'}
                         </p>
                     </div>
                     {canEdit && (

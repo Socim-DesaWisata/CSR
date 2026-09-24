@@ -21,7 +21,6 @@ export { default as ProgressBar } from './ProgressBar';
 export { default as ProjectIKM } from './ProjectIKM';
 export { default as ProjectOverview } from './ProjectOverview';
 export { default as ProjectSLOI } from './ProjectSLOI';
-export { default as ProjectSROI } from './ProjectSROI';
 export { default as ProjectTable } from './ProjectTable';
 export type { Project } from './ProjectTable';
 export { default as ScoreDistribution } from './ScoreDistribution';

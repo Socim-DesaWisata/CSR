@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/MaterialIcon-DjJctGFL.js
-import{j as a}from"./app-BRbr2KRg.js";function n({name:s,className:o="",filled:t=!1}){return a.jsx("span",{className:`material-symbols-outlined ${t?"icon-fill":""} ${o}`,style:t?{fontVariationSettings:"'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24"}:void 0,children:s})}export{n as M};
-========
-import{j as a}from"./app-CB93Q8XG.js";function n({name:s,className:o="",filled:t=!1}){return a.jsx("span",{className:`material-symbols-outlined ${t?"icon-fill":""} ${o}`,style:t?{fontVariationSettings:"'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24"}:void 0,children:s})}export{n as M};
->>>>>>>> 10ec70315ee6841669778f389f26ddb29b830a87:public/build/assets/MaterialIcon-ZVKki8Ya.js

@@ -14,7 +14,6 @@ class Respondent extends Model
     protected $fillable = [
         'company_id',
         'project_id',
-        'stakeholder_id',
         'name',
         'address',
         'phone',
@@ -49,11 +48,6 @@ class Respondent extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
-    }
-
-    public function stakeholder(): BelongsTo
-    {
-        return $this->belongsTo(ProjectStakeholder::class, 'stakeholder_id');
     }
 
     /**

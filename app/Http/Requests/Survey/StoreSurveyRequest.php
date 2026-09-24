@@ -17,7 +17,6 @@ class StoreSurveyRequest extends FormRequest
         return [
             // Respondent data
             'respondent.name' => ['required', 'string', 'max:150'],
-            'respondent.stakeholder_id' => ['nullable', 'integer', 'exists:project_stakeholders,id'],
             'respondent.phone' => ['nullable', 'string', 'max:32'],
             'respondent.age' => ['nullable', 'integer', 'min:1', 'max:120'],
             'respondent.gender' => ['nullable', 'string', 'in:male,female'],
@@ -33,7 +32,7 @@ class StoreSurveyRequest extends FormRequest
             'submission.longitude' => ['required', 'numeric', 'between:-180,180'],
 
             // Assessment type
-            'assessment_type' => ['required', 'string', 'in:IKM,SLOI,SROI'],
+            'assessment_type' => ['required', 'string', 'in:IKM,SLOI'],
 
             // Redirect intent
             'redirect_to' => ['nullable', 'string', 'in:final,continue'],
@@ -49,11 +48,6 @@ class StoreSurveyRequest extends FormRequest
             'descriptive_answers.*.question_id' => ['required', 'integer', 'exists:project_descriptive_questions,id'],
             'descriptive_answers.*.answer' => ['required', 'string', 'max:2000'],
 
-            // SROI answers
-            'sroi_answers' => ['nullable', 'array'],
-            'sroi_answers.*.project_sroi_question_id' => ['required', 'integer', 'exists:project_sroi_questions,id'],
-            'sroi_answers.*.value_text' => ['nullable', 'string'],
-            'sroi_answers.*.value_number' => ['nullable', 'numeric'],
         ];
     }
 
@@ -78,21 +72,8 @@ class StoreSurveyRequest extends FormRequest
         return [
             function (Validator $validator) {
                 $answers = $this->input('answers', []);
-                $assessmentType = strtoupper((string) $this->input('assessment_type'));
-
-                if ($assessmentType !== 'SROI' && empty($answers)) {
+                if (empty($answers)) {
                     $validator->errors()->add('answers', 'Jawaban kuesioner wajib diisi.');
-                }
-
-                if ($assessmentType === 'SROI' && empty($this->input('sroi_answers', []))) {
-                    $validator->errors()->add('sroi_answers', 'Jawaban SROI wajib diisi.');
-                }
-
-                if ($assessmentType === 'SROI' && blank($this->input('respondent.stakeholder_id'))) {
-                    $validator->errors()->add(
-                        'respondent.stakeholder_id',
-                        'Stakeholder wajib dipilih untuk survei SROI.',
-                    );
                 }
 
                 foreach ($answers as $index => $answer) {
@@ -114,18 +95,6 @@ class StoreSurveyRequest extends FormRequest
                     }
                 }
 
-                $sroiAnswers = $this->input('sroi_answers', []);
-                foreach ($sroiAnswers as $index => $answer) {
-                    $valueText = trim((string) ($answer['value_text'] ?? ''));
-                    $valueNumber = $answer['value_number'] ?? null;
-
-                    if ($valueText === '' && $valueNumber === null) {
-                        $validator->errors()->add(
-                            "sroi_answers.{$index}",
-                            'Jawaban SROI wajib diisi.',
-                        );
-                    }
-                }
             },
         ];
     }

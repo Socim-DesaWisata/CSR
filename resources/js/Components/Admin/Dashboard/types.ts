@@ -51,7 +51,6 @@ export interface SubmissionTrend {
     date: string;
     ikm: number;
     sloi: number;
-    sroi: number;
 }
 
 export interface RecentActivity {

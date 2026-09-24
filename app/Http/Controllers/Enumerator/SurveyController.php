@@ -25,15 +25,12 @@ class SurveyController extends Controller
     {
         $project = Project::with('company')->findOrFail($projectId);
         $projectCode = $request->projectCode;
-        $surveyType = $request->surveyType;
+        $surveyType = strtoupper((string) $request->surveyType);
+        abort_unless(in_array($surveyType, ['IKM', 'SLOI'], true), 404);
         $isCodeTrue = $this->surveyService->checkProjectCode($projectCode, $projectId);
 
         if ($isCodeTrue == true) {
-            $isSroi = strtoupper((string) $surveyType) === 'SROI';
-
             $questions = $this->surveyService->getQuestionsBySurveyType($project, $surveyType);
-            $projectSroiForm = $isSroi ? $this->surveyService->getActiveProjectSroiForm($project) : null;
-            $projectStakeholders = $isSroi ? $this->surveyService->getProjectStakeholders($project) : [];
 
             // Load descriptive questions for this project
             $descriptiveQuestions = $project->descriptiveQuestions()->select('id', 'title')->get();
@@ -42,8 +39,6 @@ class SurveyController extends Controller
                 'project' => $project,
                 'surveyType' => $surveyType,
                 'questions' => $questions,
-                'projectSroiForm' => $projectSroiForm,
-                'projectStakeholders' => $projectStakeholders,
                 'descriptiveQuestions' => $descriptiveQuestions,
             ]);
         } else {
@@ -147,9 +142,6 @@ class SurveyController extends Controller
             'respondent' => $data['submission']->respondent,
             'questions' => $data['questions'],
             'answersMap' => $data['answersMap'],
-            'projectSroiForm' => $data['projectSroiForm'] ?? null,
-            'projectStakeholders' => $data['projectStakeholders'] ?? [],
-            'sroiAnswersMap' => $data['sroiAnswersMap'] ?? [],
             'descriptiveQuestions' => $descriptiveQuestions,
             'descriptiveAnswersMap' => $data['descriptiveAnswersMap'],
         ]);

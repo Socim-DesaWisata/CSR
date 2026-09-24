@@ -5,8 +5,6 @@ import ProjectIKMRespondent from '@/Components/Company/ProjectIKMRespondent';
 import ProjectOverview from '@/Components/Company/ProjectOverview';
 import ProjectSLOI from '@/Components/Company/ProjectSLOI';
 import ProjectSLOIRespondent from '@/Components/Company/ProjectSLOIRespondent';
-import ProjectSROI from '@/Components/Company/ProjectSROI';
-import ProjectSROIRespondent from '@/Components/Company/ProjectSROIRespondent';
 import CompanyLayout from '@/Layouts/AppLayout';
 import { Head, router } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle, PauseCircle, X } from 'lucide-react';
@@ -26,18 +24,6 @@ interface EnumeratorItem {
     email: string;
 }
 
-interface StakeholderOutcomeItem {
-    id: number;
-    stakeholderId: number;
-    outcome: string;
-}
-
-interface StakeholderItem {
-    id: number;
-    name: string;
-    outcomes: StakeholderOutcomeItem[];
-}
-
 interface ProjectData {
     id: number;
     name: string;
@@ -47,7 +33,6 @@ interface ProjectData {
     companyName: string | null;
     enableIkm: boolean;
     enableSloi: boolean;
-    enableSroi: boolean;
     targetIkmCount: number;
     targetSloiCount: number;
     startDate: string | null;
@@ -58,7 +43,6 @@ interface ProjectData {
         id: number;
         title: string;
     }[];
-    stakeholders: StakeholderItem[];
 }
 
 interface StatsData {
@@ -162,7 +146,6 @@ interface RespondentsData {
         respondent: {
             id: number;
             name: string;
-            stakeholder?: { id: number; name: string } | null;
             address: string | null;
             phone: string | null;
             age: number | null;
@@ -271,56 +254,6 @@ interface SloiAspectAnalysis {
     };
 }
 
-interface SroiTemplateOption {
-    id: number;
-    name: string;
-    version: number;
-    description: string | null;
-    sectionCount: number;
-    questionCount: number;
-}
-
-interface ProjectSroiQuestionData {
-    id: number;
-    sectionId: number;
-    parentQuestionId: number | null;
-    sourceTemplateQuestionId: number | null;
-    questionText: string;
-    helpText: string | null;
-    answerType: 'text' | 'number' | null;
-    unit: string | null;
-    isGroup: boolean;
-    isActive: boolean;
-    orderNo: number;
-}
-
-interface ProjectSroiSectionData {
-    id: number;
-    title: string;
-    description: string | null;
-    orderNo: number;
-    sourceTemplateSectionId: number | null;
-    questions: ProjectSroiQuestionData[];
-}
-
-interface ProjectSroiFormData {
-    id: number;
-    name: string;
-    description: string | null;
-    version: number;
-    status: string;
-    sourceTemplateName: string | null;
-    activatedAt: string | null;
-    sections: ProjectSroiSectionData[];
-}
-
-interface ProjectSroiFormOption {
-    id: number;
-    name: string;
-    version: number;
-    status: string;
-    sourceTemplateName: string | null;
-}
 interface Props {
     project: ProjectData;
     detailType: string;
@@ -336,9 +269,6 @@ interface Props {
     enumeratorList: EnumeratorListItem[];
     sloiReliability: ProjectSloiReliabilityData | null;
     sloiAspectAnalysis: SloiAspectAnalysis | null;
-    sroiTemplates: SroiTemplateOption[];
-    projectSroiForms: ProjectSroiFormOption[];
-    projectSroiForm: ProjectSroiFormData | null;
     respondentFilters: RespondentFilters;
     canEdit?: boolean;
 }
@@ -368,14 +298,6 @@ function buildTabs(project: ProjectData) {
             icon: 'group',
         });
     }
-    if (project.enableSroi)
-        tabs.push({ key: 'sroi', label: 'SROI', icon: 'payments' });
-    if (project.enableSroi)
-        tabs.push({
-            key: 'sroi_respondent',
-            label: 'SROI Respondent',
-            icon: 'group',
-        });
     return tabs;
 }
 
@@ -396,9 +318,6 @@ export default function DetailProject({
     enumeratorList,
     sloiReliability,
     sloiAspectAnalysis,
-    sroiTemplates,
-    projectSroiForms,
-    projectSroiForm,
     respondentFilters,
     canEdit = true,
 }: Props) {
@@ -431,7 +350,6 @@ export default function DetailProject({
                         ikmStats={ikmStats}
                         sloiStats={sloiStats}
                         auditLog={auditLog}
-                        canEdit={canEdit}
                     />
                 );
             case 'enumerator':
@@ -489,25 +407,6 @@ export default function DetailProject({
                         canEdit={canEdit}
                     />
                 );
-            case 'sroi':
-                return (
-                    <ProjectSROI
-                        project={project}
-                        templates={sroiTemplates}
-                        forms={projectSroiForms}
-                        form={projectSroiForm}
-                        canEdit={canEdit}
-                    />
-                );
-            case 'sroi_respondent':
-                return (
-                    <ProjectSROIRespondent
-                        respondents={respondents as any}
-                        projectId={project.id}
-                        filters={respondentFilters}
-                    />
-                );
-
             default:
                 return (
                     <ProjectOverview
@@ -516,7 +415,6 @@ export default function DetailProject({
                         ikmStats={ikmStats}
                         sloiStats={sloiStats}
                         auditLog={auditLog}
-                        canEdit={canEdit}
                     />
                 );
         }

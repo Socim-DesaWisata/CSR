@@ -33,16 +33,6 @@ const features: Feature[] = [
         image: '/img/hom2.webp',
         href: '#features-section',
     },
-    {
-        title: 'Analisis SROI',
-        description:
-            'Evaluasi dampak sosial dan lingkungan dengan metodologi Social Return on Investment (Coming Soon).',
-        detailedDescription:
-            'SROI (Social Return on Investment) adalah metodologi canggih untuk mengukur nilai sosial, lingkungan, dan ekonomi yang dihasilkan dari investasi program keberlanjutan Anda. Fitur ini akan segera hadir untuk membantu Anda menghitung ROI sosial, mengidentifikasi dampak yang paling signifikan, dan mengkomunikasikan nilai program CSR Anda dalam bahasa yang dipahami oleh stakeholder bisnis.',
-        image: '/img/hom-new.webp',
-        href: '#features-section',
-        comingSoon: true,
-    },
 ];
 
 function FeatureCard({

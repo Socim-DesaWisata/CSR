@@ -8,7 +8,7 @@ export interface Project {
     id: number | string;
     code: string;
     name: string;
-    type: 'IKM' | 'SLOI' | 'SROI';
+    type: 'IKM' | 'SLOI';
     typeLabel: string;
     location: string;
     status: 'active' | 'draft' | 'closed';
@@ -43,7 +43,6 @@ interface ProjectTableProps {
 const typeColors = {
     IKM: 'text-primary',
     SLOI: 'text-primary',
-    SROI: 'text-primary',
 };
 
 function SortIcon({

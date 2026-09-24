@@ -43,7 +43,6 @@ const respondentStatusOptions: SelectOption[] = [
  */
 export interface RespondentData {
     name: string; // varchar 150, required
-    stakeholder_id?: string;
     address: string; // text, nullable
     phone: string; // varchar 32, nullable
     age: string; // integer, nullable
@@ -56,8 +55,6 @@ export interface RespondentData {
 
 interface RespondentFormProps {
     data: RespondentData;
-    isSroi?: boolean;
-    stakeholderOptions?: SelectOption[];
     onChange: (data: RespondentData) => void;
     onBack: () => void;
     onNext: () => void;
@@ -65,8 +62,6 @@ interface RespondentFormProps {
 
 export default function RespondentForm({
     data,
-    isSroi = false,
-    stakeholderOptions = [],
     onChange,
     onBack,
     onNext,
@@ -110,19 +105,6 @@ export default function RespondentForm({
                         value={data.name}
                         onChange={(value) => updateField('name', value)}
                     />
-
-                    {isSroi && (
-                        <SelectField
-                            label="Stakeholder"
-                            placeholder="Pilih stakeholder"
-                            options={stakeholderOptions}
-                            value={data.stakeholder_id ?? ''}
-                            onChange={(value) =>
-                                updateField('stakeholder_id', value)
-                            }
-                            required
-                        />
-                    )}
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         {/* Nomor Telepon */}

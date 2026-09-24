@@ -19,7 +19,6 @@ class Submission extends Model
         'assessment_type',
         'respondent_id',
         'enumerator_id',
-        'project_sroi_form_id',
         'status',
         'photo_path',
         'photo_mime',
@@ -73,14 +72,6 @@ class Submission extends Model
     }
 
     /**
-     * Get the SROI form used by this submission.
-     */
-    public function projectSroiForm(): BelongsTo
-    {
-        return $this->belongsTo(ProjectSroiForm::class, 'project_sroi_form_id');
-    }
-
-    /**
      * Get the timeline entries for this submission.
      */
     public function timelines(): HasMany
@@ -94,14 +85,6 @@ class Submission extends Model
     public function templateAnswers(): HasMany
     {
         return $this->hasMany(SubmissionTemplateAnswer::class);
-    }
-
-    /**
-     * Get the SROI answers for SROI submissions.
-     */
-    public function sroiAnswers(): HasMany
-    {
-        return $this->hasMany(SubmissionSroiAnswer::class);
     }
 
     /**
@@ -126,14 +109,6 @@ class Submission extends Model
     public function scopeSloi($query)
     {
         return $query->where('assessment_type', 'SLOI');
-    }
-
-    /**
-     * Scope a query to only include SROI submissions.
-     */
-    public function scopeSroi($query)
-    {
-        return $query->where('assessment_type', 'SROI');
     }
 
     /**

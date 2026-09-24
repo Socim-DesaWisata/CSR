@@ -3,11 +3,9 @@
 namespace App\Services;
 
 use App\Models\Project;
-use App\Models\ProjectSroiForm;
 use App\Models\Respondent;
 use App\Models\Submission;
 use App\Models\SubmissionDescriptiveAnswer;
-use App\Models\SubmissionSroiAnswer;
 use App\Models\SubmissionTemplateAnswer;
 use App\Models\TemplateQuestion;
 use Illuminate\Http\UploadedFile;
@@ -62,36 +60,6 @@ class SurveyService
         return $questions;
     }
 
-    public function getProjectStakeholders(Project $project): array
-    {
-        return $project->stakeholders()
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get()
-            ->map(fn ($stakeholder) => [
-                'id' => $stakeholder->id,
-                'name' => $stakeholder->name,
-            ])
-            ->values()
-            ->toArray();
-    }
-
-    public function getActiveProjectSroiForm(Project $project): ?array
-    {
-        $form = ProjectSroiForm::query()
-            ->where('project_id', $project->id)
-            ->active()
-            ->with([
-                'sections' => fn ($query) => $query->orderBy('order_no')->orderBy('id'),
-                'sections.questions' => fn ($query) => $query->active()->orderBy('order_no')->orderBy('id'),
-            ])
-            ->latest('activated_at')
-            ->latest('id')
-            ->first();
-
-        return $form ? $this->projectSroiFormPayload($form) : null;
-    }
-
     /**
      * Store survey data: respondent (once), submission (once), answers (many).
      */
@@ -101,10 +69,7 @@ class SurveyService
             $respondentData = $data['respondent'];
             $submissionData = $data['submission'];
             $answers = $data['answers'] ?? [];
-            $assessmentType = $data['assessment_type'] ?? ($project->enable_ikm ? 'IKM' : ($project->enable_sloi ? 'SLOI' : 'SROI'));
-            $projectSroiForm = $assessmentType === 'SROI'
-                ? ProjectSroiForm::query()->where('project_id', $project->id)->active()->latest('activated_at')->latest('id')->firstOrFail()
-                : null;
+            $assessmentType = $data['assessment_type'];
 
             // 1. Respondent — sekali saja per project + phone
             $uniqueKeys = [
@@ -116,7 +81,6 @@ class SurveyService
                 $uniqueKeys = [
                     'project_id' => $project->id,
                     'name' => $respondentData['name'],
-                    'stakeholder_id' => $assessmentType === 'SROI' ? ($respondentData['stakeholder_id'] ?? null) : null,
                 ];
             }
 
@@ -152,7 +116,6 @@ class SurveyService
                 'assessment_type' => $assessmentType,
                 'respondent_id' => $respondent->id,
                 'enumerator_id' => $enumeratorId,
-                'project_sroi_form_id' => $projectSroiForm?->id,
                 'status' => 'submitted',
                 'photo_path' => $photoPath,
                 'photo_mime' => $photo->getClientMimeType(),
@@ -161,20 +124,15 @@ class SurveyService
                 'longitude' => $submissionData['longitude'],
             ]);
 
-            if ($assessmentType === 'SROI') {
-                $this->storeSroiAnswers($submission, $data['sroi_answers'] ?? []);
-            } else {
-                // 3. Submission template answers — bisa banyak
-                $answerRecords = array_map(fn ($ans) => [
-                    'submission_id' => $submission->id,
-                    'question_id' => $ans['question_id'],
-                    'type' => $ans['type'],
-                    'value' => $ans['value'],
-                    'created_at' => now(),
-                ], $answers);
+            $answerRecords = array_map(fn ($answer) => [
+                'submission_id' => $submission->id,
+                'question_id' => $answer['question_id'],
+                'type' => $answer['type'],
+                'value' => $answer['value'],
+                'created_at' => now(),
+            ], $answers);
 
-                SubmissionTemplateAnswer::insert($answerRecords);
-            }
+            SubmissionTemplateAnswer::insert($answerRecords);
 
             // 4. Submission descriptive answers (optional)
             $descriptiveAnswers = $data['descriptive_answers'] ?? [];
@@ -301,7 +259,7 @@ class SurveyService
     {
         $submission = Submission::with([
             'respondent',
-            'project:id,name,company_id,ikm_template_id,sloi_template_id,enable_ikm,enable_sloi,enable_sroi',
+            'project:id,name,company_id,ikm_template_id,sloi_template_id,enable_ikm,enable_sloi',
             'project.company:id,name',
         ])
             ->where('enumerator_id', $enumeratorId)
@@ -332,46 +290,11 @@ class SurveyService
             $descriptiveAnswersMap[$da->project_descriptive_question_id] = $da->answer;
         }
 
-        $projectSroiForm = null;
-        $projectStakeholders = [];
-        $sroiAnswersMap = [];
-
-        if (strtoupper($submission->assessment_type) === 'SROI') {
-            $form = $submission->project_sroi_form_id
-                ? ProjectSroiForm::query()
-                    ->where('project_id', $project->id)
-                    ->with([
-                        'sections' => fn ($query) => $query->orderBy('order_no')->orderBy('id'),
-                        'sections.questions' => fn ($query) => $query->active()->orderBy('order_no')->orderBy('id'),
-                    ])
-                    ->find($submission->project_sroi_form_id)
-                : null;
-
-            $projectSroiForm = $form
-                ? $this->projectSroiFormPayload($form)
-                : $this->getActiveProjectSroiForm($project);
-
-            $projectStakeholders = $this->getProjectStakeholders($project);
-
-            SubmissionSroiAnswer::query()
-                ->where('submission_id', $submissionId)
-                ->whereNull('deleted_at')
-                ->get(['project_sroi_question_id', 'value_text', 'value_number'])
-                ->each(function (SubmissionSroiAnswer $answer) use (&$sroiAnswersMap) {
-                    $sroiAnswersMap[$answer->project_sroi_question_id] = $answer->value_number !== null
-                        ? (string) $answer->value_number
-                        : (string) ($answer->value_text ?? '');
-                });
-        }
-
         return [
             'submission' => $submission,
             'questions' => $questions,
             'answersMap' => $answersMap,
             'descriptiveAnswersMap' => $descriptiveAnswersMap,
-            'projectSroiForm' => $projectSroiForm,
-            'projectStakeholders' => $projectStakeholders,
-            'sroiAnswersMap' => $sroiAnswersMap,
         ];
     }
 
@@ -398,7 +321,6 @@ class SurveyService
             if ($respondent) {
                 $respondent->update([
                     'name' => $respondentData['name'],
-                    'stakeholder_id' => $assessmentType === 'SROI' ? ($respondentData['stakeholder_id'] ?? null) : null,
                     'address' => $respondentData['address'] ?? null,
                     'phone' => $respondentData['phone'] ?? null,
                     'age' => $respondentData['age'] ?? null,
@@ -418,23 +340,6 @@ class SurveyService
                 'status' => 'submitted', // reset to submitted after edit
             ];
 
-            if ($assessmentType === 'SROI') {
-                $projectSroiForm = $submission->project_sroi_form_id
-                    ? ProjectSroiForm::query()->where('project_id', $submission->project_id)->find($submission->project_sroi_form_id)
-                    : null;
-
-                $projectSroiForm ??= ProjectSroiForm::query()
-                    ->where('project_id', $submission->project_id)
-                    ->active()
-                    ->latest('activated_at')
-                    ->latest('id')
-                    ->first();
-
-                $updateFields['project_sroi_form_id'] = $projectSroiForm?->id;
-            } else {
-                $updateFields['project_sroi_form_id'] = null;
-            }
-
             if (! empty($submissionData['photo'])) {
                 /** @var \Illuminate\Http\UploadedFile $photo */
                 $photo = $submissionData['photo'];
@@ -446,22 +351,17 @@ class SurveyService
             $submission->update($updateFields);
 
             // 3. Replace answers: soft-delete old, insert new
-            if ($assessmentType === 'SROI') {
-                SubmissionSroiAnswer::where('submission_id', $submissionId)->delete();
-                $this->storeSroiAnswers($submission, $data['sroi_answers'] ?? []);
-            } else {
-                SubmissionTemplateAnswer::where('submission_id', $submissionId)->delete();
+            SubmissionTemplateAnswer::where('submission_id', $submissionId)->delete();
 
-                $answerRecords = array_map(fn ($ans) => [
-                    'submission_id' => $submissionId,
-                    'question_id' => $ans['question_id'],
-                    'type' => $ans['type'],
-                    'value' => $ans['value'],
-                    'created_at' => now(),
-                ], $answers);
+            $answerRecords = array_map(fn ($answer) => [
+                'submission_id' => $submissionId,
+                'question_id' => $answer['question_id'],
+                'type' => $answer['type'],
+                'value' => $answer['value'],
+                'created_at' => now(),
+            ], $answers);
 
-                SubmissionTemplateAnswer::insert($answerRecords);
-            }
+            SubmissionTemplateAnswer::insert($answerRecords);
 
             // 4. Replace descriptive answers: soft-delete old, insert new
             SubmissionDescriptiveAnswer::where('submission_id', $submissionId)->delete();
@@ -479,32 +379,6 @@ class SurveyService
         });
     }
 
-    private function projectSroiFormPayload(ProjectSroiForm $form): array
-    {
-        return [
-            'id' => $form->id,
-            'name' => $form->name,
-            'description' => $form->description,
-            'sections' => $form->sections->map(fn ($section) => [
-                'id' => $section->id,
-                'title' => $section->title,
-                'description' => $section->description,
-                'orderNo' => $section->order_no,
-                'questions' => $section->questions->map(fn ($question) => [
-                    'id' => $question->id,
-                    'sectionId' => $question->section_id,
-                    'parentQuestionId' => $question->parent_question_id,
-                    'questionText' => $question->question_text,
-                    'helpText' => $question->help_text,
-                    'answerType' => $question->answer_type,
-                    'unit' => $question->unit,
-                    'isGroup' => $question->is_group,
-                    'orderNo' => $question->order_no,
-                ])->values()->toArray(),
-            ])->values()->toArray(),
-        ];
-    }
-
     private function firstOrCreateRespondent(array $uniqueKeys, array $allData): array
     {
         $respondent = Respondent::where(function ($q) use ($uniqueKeys) {
@@ -520,29 +394,5 @@ class SurveyService
         $respondent = Respondent::create($allData);
 
         return [$respondent, true];
-    }
-
-    private function storeSroiAnswers(Submission $submission, array $answers): void
-    {
-        $answerRecords = collect($answers)
-            ->map(function (array $answer) use ($submission) {
-                $valueText = $answer['value_text'] ?? null;
-                $valueNumber = $answer['value_number'] ?? null;
-
-                return [
-                    'submission_id' => $submission->id,
-                    'project_sroi_question_id' => $answer['project_sroi_question_id'],
-                    'value_text' => $valueText === '' ? null : $valueText,
-                    'value_number' => $valueNumber === '' ? null : $valueNumber,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            })
-            ->values()
-            ->toArray();
-
-        if ($answerRecords !== []) {
-            SubmissionSroiAnswer::insert($answerRecords);
-        }
     }
 }

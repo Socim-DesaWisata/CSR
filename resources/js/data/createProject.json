@@ -11,12 +11,6 @@
             "icon": "verified_user",
             "title": "SLOI",
             "description": "Social License to Operate Index"
-        },
-        {
-            "id": "sroi",
-            "icon": "paid",
-            "title": "SROI",
-            "description": "Social Return on Investment"
         }
     ],
     "formSteps": [
@@ -38,9 +32,7 @@
         "description": "",
         "targetRespondents": "500",
         "launchDate": "",
-        "assessmentTypes": [
-            "ikm"
-        ]
+        "assessmentTypes": ["ikm"]
     },
     "targetOptions": [
         {
@@ -73,29 +65,21 @@
             "id": "community-satisfaction",
             "name": "Survei Kepuasan Masyarakat",
             "description": "Template standar untuk mengukur kepuasan masyarakat terhadap layanan CSR",
-            "defaultTypes": [
-                "ikm"
-            ],
+            "defaultTypes": ["ikm"],
             "targetRespondents": "500"
         },
         {
             "id": "social-license",
             "name": "Penilaian Izin Sosial",
             "description": "Mengukur tingkat penerimaan masyarakat terhadap operasional perusahaan",
-            "defaultTypes": [
-                "sloi"
-            ],
+            "defaultTypes": ["sloi"],
             "targetRespondents": "1000"
         },
         {
             "id": "impact-assessment",
             "name": "Penilaian Dampak Komprehensif",
             "description": "Evaluasi menyeluruh dampak sosial, ekonomi, dan lingkungan",
-            "defaultTypes": [
-                "ikm",
-                "sloi",
-                "sroi"
-            ],
+            "defaultTypes": ["ikm", "sloi"],
             "targetRespondents": "2500"
         }
     ]
