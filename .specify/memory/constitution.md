@@ -1,50 +1,75 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: unratified scaffold -> 1.0.0
+Modified principles: added Authorization and Company Data Isolation; Trustworthy Survey and Assessment Data; Tested Behavior at Trust Boundaries; Consistent Laravel and Inertia Architecture; Small, Maintainable Changes
+Added sections: Product Constraints; Delivery Workflow
+Removed sections: none
+Follow-up TODOs: confirm the original ratification date
+-->
+# CSR Survey Platform Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Authorization and Company Data Isolation
+Every authenticated route and data operation MUST enforce the user's role and permitted
+company/project scope. Requests MUST NOT expose or mutate records outside that scope;
+authorization rules MUST be covered by tests. This protects respondent and company data.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Trustworthy Survey and Assessment Data
+IKM and SLOI submissions, answers, status changes, and derived scores MUST preserve their
+relationships and domain rules. Multi-record writes MUST be atomic, and score outputs MUST
+remain traceable to their source submissions and calculation details. Changes to assessment
+logic MUST include tests for normal, boundary, and insufficient-data cases.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Tested Behavior at Trust Boundaries
+Every behavior change MUST add or update automated Pest coverage for its relevant success and
+failure paths. Validation MUST happen at request boundaries; persistence and authorization
+invariants MUST be verified at the appropriate application or database layer. Run the narrowest
+relevant tests before delivery.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Consistent Laravel and Inertia Architecture
+Server-rendered application pages MUST follow the existing Laravel, Inertia v2, and React
+patterns. Use Form Requests for request validation, Eloquent relationships for domain data,
+named routes for navigation, and existing components before introducing new abstractions.
+This keeps the web experience and server behavior coherent.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Small, Maintainable Changes
+Implement the smallest change that satisfies the requirement. Reuse installed dependencies and
+existing conventions; new dependencies, architectural layers, or duplicated domain logic require
+clear justification. Keep generated build output and unrelated worktree changes out of focused
+source changes.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Product Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+The application manages CSR projects, companies, enumerators, respondents, survey instruments,
+submissions, and IKM/SLOI assessment results. Preserve these domain relationships and role-based
+flows when changing behavior. Treat respondent identity, contact details, photographs, and
+location data as sensitive: collect and expose only what the authorized workflow requires.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+The established stack is Laravel 12, PHP 8.2+, Inertia v2, React 18, TypeScript, and Tailwind CSS
+3, with Pest 4 for tests. Follow the installed project versions and existing structure; do not
+change dependencies or introduce a new framework without approval.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Delivery Workflow
+
+For each change, inspect the affected route, request, service, model, and UI paths; update tests
+alongside behavior changes. Run focused Pest tests for backend behavior, `vendor/bin/pint --dirty
+--format agent` for PHP changes, and the relevant frontend build or checks for UI changes.
+Review the final diff to confirm scope, authorization, data integrity, accessibility, and absence
+of unrelated generated artifacts.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution governs implementation and review decisions. Amendments MUST update this file
+and its version/date metadata. Use semantic versioning: MAJOR for incompatible governance changes,
+MINOR for new or materially expanded principles or sections, and PATCH for clarifications that
+do not change obligations. The original ratification date is not recorded in the repository and
+MUST be confirmed before replacing the explicit TODO. The last-amended date records the date of
+the latest approved change.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Every change review MUST check relevant principles, tests, and scope. Exceptions MUST be stated
+with rationale and approval in the change discussion; security, authorization, and data integrity
+requirements cannot be waived. Keep implementation guidance in the applicable project instructions
+and use this constitution as the governance source.
+
+**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): confirm original adoption date | **Last Amended**: 2026-09-24
