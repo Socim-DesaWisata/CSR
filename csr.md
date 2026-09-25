@@ -1,6 +1,13 @@
 # Rancangan Database CSR: IKM, SLOI, dan SROI Mandiri
 
-Status: rancangan dokumentasi, 2026-09-24. Belum ada migrasi atau perubahan data. Target tipe dan constraint: MySQL 8.0.16+; adaptasi ke database lain memerlukan pengujian ulang `CHECK` dan FK gabungan. Rancangan ini menyatukan inventaris aplikasi CSR yang berjalan dengan kebutuhan dari empat dokumen `sroi/` dan alur situs pembanding. `sroi/new-db.md` identik byte-per-byte dengan `sroi/database-sroi.dbml`; keduanya dihitung sebagai satu skema referensi, bukan dua skema yang harus diimplementasikan.
+Status: rancangan target dan implementasi fase input, 2026-09-24. Sebanyak 24 tabel operasional SROI sudah dimigrasikan; lima tabel metode/run tetap rancangan tertunda. Target tipe dan constraint: MySQL 8.0.16+; adaptasi ke database lain memerlukan pengujian ulang `CHECK` dan FK gabungan. Rancangan ini menyatukan inventaris aplikasi CSR yang berjalan dengan kebutuhan dari empat dokumen `sroi/` dan alur situs pembanding. `sroi/new-db.md` identik byte-per-byte dengan `sroi/database-sroi.dbml`; keduanya dihitung sebagai satu skema referensi, bukan dua skema yang harus diimplementasikan.
+
+## Status implementasi fase input
+
+- Migrasi `create_sroi_operational_tables` membuat katalog, program, tahap input, dokumen, ekspor, dan audit. Migrasi `add_sroi_input_checks` menambahkan `CHECK` MySQL untuk status, rentang angka, dan persentase; validasi request dan FK gabungan juga membatasi hubungan lintas perusahaan/program.
+- `sroi_methods`, `sroi_runs`, `sroi_run_outcome_years`, `sroi_run_investment_years`, dan `sroi_run_yearly_totals` **belum dimigrasikan**. Kolom `sroi_report_exports.run_id` pada rancangan target juga ditunda sampai run tersedia. Tidak ada kalkulasi atau laporan berbasis rasio.
+- Ekspor data tahap XLSX, laporan naratif DOCX, serta dokumen bukti disimpan privat dan hanya diunduh melalui route berotorisasi. Katalog admin membuat kategori perusahaan langsung; `sroi_catalog_templates` tersedia dalam skema sebagai sumber template, tetapi alur penyalinan template belum diaktifkan.
+- `companies` dan `users` tetap dipakai bersama; tidak ada tabel profil/kontak/sektor perusahaan SROI ataupun FK ke `projects`. Basis MySQL lokal dapat menjalankan migrasi tanpa migrasi ulang tabel IKM/SLOI.
 
 ## Temuan dan batas desain
 

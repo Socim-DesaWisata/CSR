@@ -28,7 +28,10 @@ export default function AppLayout({
             return false;
         }
 
-        return window.localStorage.getItem('company-sidebar-collapsed') === '1';
+        return (
+            window.innerWidth < 768 ||
+            window.localStorage.getItem('company-sidebar-collapsed') === '1'
+        );
     });
 
     useEffect(() => {
@@ -54,7 +57,7 @@ export default function AppLayout({
                 }}
             />
 
-            <main className="flex flex-1 flex-col overflow-y-auto">
+            <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
                 <Header breadcrumb={breadcrumb} />
                 <div className="flex-1">{children}</div>
                 <Footer />

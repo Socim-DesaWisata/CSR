@@ -73,6 +73,11 @@ class User extends Authenticatable
         return $this->hasMany(Project::class, 'created_by');
     }
 
+    public function createdSroiPrograms(): HasMany
+    {
+        return $this->hasMany(SroiProgram::class, 'created_by');
+    }
+
     /**
      * Get the instrument templates created by this user.
      */

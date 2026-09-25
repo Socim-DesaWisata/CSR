@@ -35,6 +35,12 @@ const navItems: NavItemProps[] = [
         label: 'Enumerators',
         hideForRoles: ['superadmin', 'admin'],
     },
+    {
+        href: '/sroi/program',
+        icon: 'insights',
+        label: 'SROI',
+        roles: ['admin', 'superadmin', 'company'],
+    },
     { href: '/profile', icon: 'settings', label: 'Settings' },
     {
         href: '/templates',
@@ -95,6 +101,93 @@ export default function Sidebar({
         router.post(route('logout'));
     };
 
+    const sroiMode = currentRoute?.startsWith('/sroi');
+    const programId = currentRoute?.match(/^\/sroi\/program\/(\d+)/)?.[1];
+    const stageHref = (stage: string) =>
+        programId ? `/sroi/program/${programId}/${stage}` : '/sroi/program';
+    const sroiGroups: { heading: string; items: NavItemProps[] }[] = [
+        {
+            heading: 'Utama',
+            items: [
+                { href: '/sroi', icon: 'dashboard', label: 'Dashboard' },
+                {
+                    href: '/sroi/program',
+                    icon: 'list_alt',
+                    label: 'Program List',
+                },
+                {
+                    href: stageHref('report'),
+                    icon: 'description',
+                    label: 'SROI Report',
+                },
+            ],
+        },
+        {
+            heading: 'Perencanaan',
+            items: [
+                {
+                    href: stageHref('description'),
+                    icon: 'article',
+                    label: 'General Description',
+                },
+                {
+                    href: stageHref('theory-of-change'),
+                    icon: 'account_tree',
+                    label: 'Theory of Change',
+                },
+                { href: stageHref('lfa'), icon: 'schema', label: 'LFA' },
+                { href: stageHref('roadmap'), icon: 'route', label: 'Roadmap' },
+            ],
+        },
+        {
+            heading: 'Penilaian',
+            items: [
+                {
+                    href: stageHref('scope'),
+                    icon: 'fact_check',
+                    label: 'Program Scope',
+                },
+                {
+                    href: stageHref('stakeholder'),
+                    icon: 'groups',
+                    label: 'Stakeholder Identification',
+                },
+                {
+                    href: stageHref('outcome'),
+                    icon: 'checklist',
+                    label: 'Outcome Identification',
+                },
+                {
+                    href: stageHref('table'),
+                    icon: 'table_chart',
+                    label: 'SROI Table',
+                },
+                {
+                    href: stageHref('calculation'),
+                    icon: 'calculate',
+                    label: 'SROI Calculation',
+                },
+            ],
+        },
+        {
+            heading: 'Admin',
+            items: [
+                {
+                    href: '/sroi/catalog',
+                    icon: 'category',
+                    label: 'Stakeholder & Outcome',
+                    roles: ['admin', 'superadmin'],
+                },
+                {
+                    href: '/sroi/companies',
+                    icon: 'business',
+                    label: 'Company List',
+                    roles: ['admin', 'superadmin'],
+                },
+            ],
+        },
+    ];
+
     return (
         <aside
             className={`relative z-10 flex flex-shrink-0 flex-col bg-primary text-white transition-all duration-300 ${
@@ -142,36 +235,70 @@ export default function Sidebar({
             </div>
 
             <nav
-                className={`flex-1 space-y-1 ${
+                className={`flex-1 space-y-1 overflow-y-auto ${
                     collapsed ? 'w-full px-2 py-4' : 'mt-4 px-4'
                 }`}
             >
-                {navItems
-                    .filter((item) => {
-                        const userRole = user.role.toLowerCase();
-                        const isAllowedByRoles =
-                            !item.roles ||
-                            item.roles
-                                .map((r) => r.toLowerCase())
-                                .includes(userRole);
-                        const isHiddenByRoles =
-                            item.hideForRoles &&
-                            item.hideForRoles
-                                .map((r) => r.toLowerCase())
-                                .includes(userRole);
-                        return isAllowedByRoles && !isHiddenByRoles;
-                    })
-                    .map((item) => (
-                        <NavItem
-                            key={item.href}
-                            {...item}
-                            collapsed={collapsed}
-                            active={
-                                currentRoute === item.href ||
-                                currentRoute?.startsWith(item.href + '/')
-                            }
-                        />
-                    ))}
+                {sroiMode && (
+                    <NavItem
+                        href="/dashboard"
+                        icon="arrow_back"
+                        label="Kembali ke CSR"
+                        collapsed={collapsed}
+                    />
+                )}
+                {sroiMode
+                    ? sroiGroups.map((group) => {
+                          const items = group.items.filter(
+                              (item) =>
+                                  !item.roles ||
+                                  item.roles.includes(user.role.toLowerCase()),
+                          );
+                          if (!items.length) return null;
+                          return (
+                              <div key={group.heading} className="pt-3">
+                                  {!collapsed && (
+                                      <p className="px-4 pb-2 text-xs font-semibold uppercase tracking-wide text-white/60">
+                                          {group.heading}
+                                      </p>
+                                  )}
+                                  {items.map((item) => (
+                                      <NavItem
+                                          key={`${group.heading}-${item.label}`}
+                                          {...item}
+                                          collapsed={collapsed}
+                                          active={currentRoute === item.href}
+                                      />
+                                  ))}
+                              </div>
+                          );
+                      })
+                    : navItems
+                          .filter((item) => {
+                              const userRole = user.role.toLowerCase();
+                              const isAllowedByRoles =
+                                  !item.roles ||
+                                  item.roles
+                                      .map((r) => r.toLowerCase())
+                                      .includes(userRole);
+                              const isHiddenByRoles =
+                                  item.hideForRoles &&
+                                  item.hideForRoles
+                                      .map((r) => r.toLowerCase())
+                                      .includes(userRole);
+                              return isAllowedByRoles && !isHiddenByRoles;
+                          })
+                          .map((item) => (
+                              <NavItem
+                                  key={item.href}
+                                  {...item}
+                                  collapsed={collapsed}
+                                  active={
+                                      currentRoute === item.href ||
+                                      currentRoute?.startsWith(item.href + '/')
+                                  }
+                              />
+                          ))}
             </nav>
 
             {!collapsed && (

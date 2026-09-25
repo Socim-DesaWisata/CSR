@@ -10,6 +10,11 @@ use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\InstrumentTemplateController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\Sroi\CatalogController as SroiCatalogController;
+use App\Http\Controllers\Sroi\DocumentController as SroiDocumentController;
+use App\Http\Controllers\Sroi\ExportController as SroiExportController;
+use App\Http\Controllers\Sroi\ProgramController as SroiProgramController;
+use App\Http\Controllers\Sroi\StageController as SroiStageController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -23,6 +28,28 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
+});
+
+Route::prefix('sroi')->middleware('auth')->name('sroi.')->group(function () {
+    Route::get('/', [SroiProgramController::class, 'dashboard'])->name('dashboard');
+    Route::get('/program', [SroiProgramController::class, 'index'])->name('programs.index');
+    Route::post('/program', [SroiProgramController::class, 'store'])->name('programs.store');
+    Route::put('/program/{program}', [SroiProgramController::class, 'update'])->name('programs.update');
+    Route::get('/program/{program}/{stage}', [SroiStageController::class, 'show'])->name('programs.stage');
+    Route::put('/program/{program}/theory-of-change', [SroiStageController::class, 'saveTheory'])->name('theory-of-change.save');
+    Route::put('/program/{program}/{stage}/entries/batch', [SroiStageController::class, 'saveBatch'])->name('stages.batch-save');
+    Route::post('/program/{program}/entry/{section}', [SroiStageController::class, 'store'])->name('entries.store');
+    Route::put('/program/{program}/entry/{section}/{entry}', [SroiStageController::class, 'update'])->name('entries.update');
+    Route::delete('/program/{program}/entry/{section}/{entry}', [SroiStageController::class, 'destroy'])->name('entries.destroy');
+    Route::get('/catalog', [SroiCatalogController::class, 'index'])->name('catalog.index');
+    Route::get('/companies', fn (\Illuminate\Http\Request $request) => app(SroiCatalogController::class)->index($request, 'companies'))->name('companies.index');
+    Route::post('/catalog/{kind}', [SroiCatalogController::class, 'store'])->name('catalog.store');
+    Route::put('/catalog/{kind}/{entry}', [SroiCatalogController::class, 'update'])->name('catalog.update');
+    Route::post('/program/{program}/export/{stage}', [SroiExportController::class, 'create'])->name('exports.store');
+    Route::get('/program/{program}/export/{export}', [SroiExportController::class, 'download'])->whereNumber('export')->name('exports.download');
+    Route::post('/program/{program}/document/{stage}', [SroiDocumentController::class, 'store'])->name('documents.store');
+    Route::get('/program/{program}/document/{document}', [SroiDocumentController::class, 'download'])->whereNumber('document')->name('documents.download');
+    Route::get('/program/{program}/areas/{level}', [SroiStageController::class, 'areas'])->name('areas.index');
 });
 
 Route::prefix('enumerator')->middleware('auth')->name('enumerator.')->group(function () {

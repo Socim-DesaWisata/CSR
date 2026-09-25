@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^4.0",
+        "phpoffice/phpword": "^1.4",
         "silviolleite/laravelpwa": "^2.0",
         "tightenco/ziggy": "^2.0"
     },

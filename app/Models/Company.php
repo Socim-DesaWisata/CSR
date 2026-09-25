@@ -35,6 +35,11 @@ class Company extends Model
         return $this->hasMany(Project::class);
     }
 
+    public function sroiPrograms(): HasMany
+    {
+        return $this->hasMany(SroiProgram::class);
+    }
+
     /**
      * Get the respondents for the company.
      */
