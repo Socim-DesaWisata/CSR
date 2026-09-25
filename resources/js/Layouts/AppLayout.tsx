@@ -17,10 +17,7 @@ export default function AppLayout({
     breadcrumb,
 }: AppLayoutProps): ReactNode {
     const { auth } = usePage().props as unknown as {
-        auth: {
-            user: { name: string; email: string; role: string };
-            companyName?: string;
-        };
+        auth: { user: { role: string } };
     };
     const currentPath = window.location.pathname;
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -46,19 +43,25 @@ export default function AppLayout({
             <Sidebar
                 collapsed={isSidebarCollapsed}
                 currentRoute={currentPath}
-                onToggleCollapse={() =>
-                    setIsSidebarCollapsed((collapsed) => !collapsed)
-                }
-                user={{
-                    companyName: auth.companyName,
-                    name: auth.user.name,
-                    email: auth.user.email,
-                    role: auth.user.role,
-                }}
+                user={{ role: auth.user.role }}
             />
+            {!isSidebarCollapsed && (
+                <button
+                    type="button"
+                    onClick={() => setIsSidebarCollapsed(true)}
+                    aria-label="Tutup sidebar"
+                    className="fixed bottom-0 left-0 right-0 top-20 z-20 bg-black/30 md:hidden"
+                />
+            )}
 
             <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
-                <Header breadcrumb={breadcrumb} />
+                <Header
+                    breadcrumb={breadcrumb}
+                    sidebarCollapsed={isSidebarCollapsed}
+                    onToggleSidebar={() =>
+                        setIsSidebarCollapsed((collapsed) => !collapsed)
+                    }
+                />
                 <div className="flex-1">{children}</div>
                 <Footer />
             </main>

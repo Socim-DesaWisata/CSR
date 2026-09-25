@@ -48,6 +48,7 @@ class SroiStages
             'targets' => ['roadmap', 'Target Tahunan', 'sroi_roadmap_targets', [
                 'roadmap_item_id' => 'reference:sroi_roadmap_items', 'year' => 'year',
                 'target_quantity' => 'number?', 'unit' => 'string?',
+                'output_quantity' => 'number?', 'output_unit' => 'string?',
             ]],
             'scopes' => ['scope', 'Cakupan Penilaian', 'sroi_program_scopes', [
                 'assessment_type' => 'enum:evaluative,forecast,both',
@@ -72,11 +73,11 @@ class SroiStages
                 'significant' => 'boolean', 'material' => 'boolean',
                 'materiality_reason' => 'text', 'materiality_explanation' => 'text?',
             ]],
-            'indicators' => ['outcome', 'Indikator Outcome', 'sroi_outcome_indicators', [
+            'indicators' => ['table', 'Indikator Outcome', 'sroi_outcome_indicators', [
                 'outcome_id' => 'reference:sroi_program_outcomes', 'name' => 'string',
                 'unit' => 'string?', 'evidence' => 'text', 'evidence_source' => 'text',
             ]],
-            'proxies' => ['outcome', 'Proksi Finansial', 'sroi_financial_proxies', [
+            'proxies' => ['table', 'Proksi Finansial', 'sroi_financial_proxies', [
                 'outcome_id' => 'reference:sroi_program_outcomes', 'approach' => 'string',
                 'description' => 'text?', 'source' => 'text', 'unit' => 'string',
                 'unit_value' => 'money?', 'currency_code' => 'currency',

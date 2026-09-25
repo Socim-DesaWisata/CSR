@@ -62,7 +62,29 @@ class StageController extends Controller
             'canManageMembers' => $request->user()->role !== 'company' || $program->created_by === $request->user()->id
                 || DB::table('sroi_program_members')->where('program_id', $program->id)->where('user_id', $request->user()->id)->where('participation', 'owner')->exists(),
             'sections' => $sections,
-            'documents' => DB::table('sroi_program_documents')->where('company_id', $program->company_id)->where('program_id', $program->id)->where('stage', $stage)->get(['id', 'file_name', 'size_bytes']),
+            ...($stage === 'roadmap' ? ['roadmapActivities' => DB::table('sroi_lfa_nodes as activities')
+                ->leftJoin('sroi_lfa_nodes as outputs', function ($join) use ($program): void {
+                    $join->on('outputs.id', '=', 'activities.parent_id')
+                        ->where('outputs.company_id', $program->company_id)
+                        ->where('outputs.program_id', $program->id)
+                        ->where('outputs.level', 'output');
+                })
+                ->leftJoinSub(
+                    DB::table('sroi_roadmap_items')->selectRaw('lfa_activity_id, MIN(id) as id')
+                        ->where('company_id', $program->company_id)->where('program_id', $program->id)
+                        ->whereNotNull('lfa_activity_id')->groupBy('lfa_activity_id'),
+                    'roadmap_items',
+                    fn ($join) => $join->on('roadmap_items.lfa_activity_id', '=', 'activities.id'),
+                )
+                ->where('activities.company_id', $program->company_id)->where('activities.program_id', $program->id)
+                ->where('activities.level', 'activity')->orderBy('activities.sort_order')->orderBy('activities.id')
+                ->get([
+                    'activities.id as activity_id', 'activities.element as activity',
+                    'outputs.element as output', 'roadmap_items.id as roadmap_item_id',
+                ])] : []),
+            'documents' => DB::table('sroi_program_documents')->where('company_id', $program->company_id)->where('program_id', $program->id)
+                ->when($stage !== 'description', fn ($query) => $query->where('stage', $stage))
+                ->orderBy('id')->get(['id', 'file_name', 'size_bytes']),
             'exports' => DB::table('sroi_report_exports')->where('company_id', $program->company_id)->where('program_id', $program->id)
                 ->when($stage === 'theory-of-change', fn (Builder $query) => $query->whereIn('stage', [$stage, $stage.':conditions', $stage.':flows']),
                     fn (Builder $query) => $query->where($stage === 'report' ? 'report_type' : 'stage', $stage === 'report' ? 'qualitative' : $stage))
@@ -176,8 +198,8 @@ class StageController extends Controller
                 }
 
                 $createdIds = [];
-                $parentSections = ['items', 'outcomes', 'stakeholders'];
-                foreach ($this->batchSectionOrder($stage) as $section) {
+                $parentSections = ['items', 'outcomes', 'stakeholders', 'nodes', 'investments'];
+                foreach (array_reverse($this->batchSectionOrder($stage)) as $section) {
                     if (! isset($entriesBySection[$section]) || in_array($section, $parentSections, true)) {
                         continue;
                     }
@@ -226,7 +248,11 @@ class StageController extends Controller
     private function createBatchSection(Request $request, SroiProgram $program, string $section, array $entries, array $definitions, array &$createdIds): void
     {
         [, , $table] = SroiStages::definitions()[$section];
-        $hasOrder = in_array($section, ['items', 'stakeholders', 'outcomes', 'indicators'], true);
+        if ($section === 'nodes') {
+            $levels = ['goal' => 0, 'purpose' => 1, 'output' => 2, 'activity' => 3];
+            uasort($entries['create'], fn (array $left, array $right): int => $levels[$left['values']['level']] <=> $levels[$right['values']['level']]);
+        }
+        $hasOrder = in_array($section, ['nodes', 'items', 'stakeholders', 'outcomes', 'indicators', 'investments'], true);
         $order = $hasOrder ? (int) $this->records($table, $program)->max('sort_order') : 0;
         foreach ($entries['create'] as $clientKey => $entry) {
             $values = $this->resolveDraftReferences($entry['values'], $section, $createdIds, $definitions);
@@ -249,6 +275,10 @@ class StageController extends Controller
     private function deleteBatchSection(Request $request, SroiProgram $program, string $section, array $entries, array $snapshots): void
     {
         [, , $table] = SroiStages::definitions()[$section];
+        if ($section === 'nodes') {
+            $levels = ['goal' => 0, 'purpose' => 1, 'output' => 2, 'activity' => 3];
+            usort($entries['delete'], fn (array $left, array $right): int => $levels[$snapshots[$section][$right['id']]['level']] <=> $levels[$snapshots[$section][$left['id']]['level']]);
+        }
         foreach ($entries['delete'] as $entry) {
             $this->records($table, $program)->where('id', $entry['id'])->delete();
             $this->audit($request, $program, $section, $entry['id'], 'archive', $snapshots[$section][$entry['id']], null);
@@ -258,10 +288,12 @@ class StageController extends Controller
     private function batchSectionOrder(string $stage): array
     {
         return match ($stage) {
+            'lfa' => ['nodes'],
+            'scope' => ['scopes', 'investments', 'investment-years'],
             'roadmap' => ['items', 'targets'],
             'stakeholder' => ['stakeholders'],
-            'outcome' => ['outcomes', 'indicators', 'proxies'],
-            'table' => ['impact-years'],
+            'outcome' => ['outcomes'],
+            'table' => ['indicators', 'proxies', 'impact-years'],
         };
     }
 

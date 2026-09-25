@@ -43,11 +43,19 @@ class StoreProgramRequest extends FormRequest
             'description' => ['required', 'string'],
             'boundary_text' => ['required', 'string'],
             'status' => ['required', Rule::in(['draft', 'active', 'archived'])],
+            'document' => $program instanceof SroiProgram
+                ? ['nullable', 'file', 'mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png', 'max:10240']
+                : ['prohibited'],
         ];
     }
 
     public function messages(): array
     {
-        return ['category_id.exists' => 'Kategori harus berasal dari perusahaan program.', 'end_year.gte' => 'Tahun akhir tidak boleh sebelum tahun awal.'];
+        return [
+            'category_id.exists' => 'Kategori harus berasal dari perusahaan program.',
+            'end_year.gte' => 'Tahun akhir tidak boleh sebelum tahun awal.',
+            'document.mimes' => 'Format berkas tidak didukung.',
+            'document.max' => 'Ukuran berkas maksimal 10 MB.',
+        ];
     }
 }

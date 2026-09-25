@@ -14,7 +14,7 @@ class SaveStageBatchRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        abort_unless(in_array($this->route('stage'), ['roadmap', 'stakeholder', 'outcome', 'table'], true), 404);
+        abort_unless(in_array($this->route('stage'), ['roadmap', 'stakeholder', 'outcome', 'table', 'lfa', 'scope'], true), 404);
         app(ProgramController::class)->access($this, $this->route('program'), true);
 
         return true;
@@ -109,8 +109,74 @@ class SaveStageBatchRequest extends FormRequest
             }
 
             $this->validateUniqueRows($validator, $program, $definitions);
+            $this->validateScopePeriods($validator);
             $this->validateImpactReferences($validator, $program);
+            $this->validateLfaNodes($validator, $program);
         }];
+    }
+
+    private function validateLfaNodes(Validator $validator, SroiProgram $program): void
+    {
+        if ($this->route('stage') !== 'lfa') {
+            return;
+        }
+
+        $entries = $this->input('sections.nodes');
+        $expectedParents = ['goal' => null, 'purpose' => 'goal', 'output' => 'purpose', 'activity' => 'output'];
+        $draftLevels = [];
+        $updatedLevels = [];
+        $deletedIds = array_map('intval', array_column($entries['delete'], 'id'));
+
+        foreach ($entries['create'] as $key => $entry) {
+            $draftLevels[$key] = $entry['values']['level'];
+        }
+        foreach ($entries['update'] as $entry) {
+            $updatedLevels[(int) $entry['id']] = $entry['values']['level'];
+        }
+
+        foreach (['create', 'update'] as $operation) {
+            foreach ($entries[$operation] as $key => $entry) {
+                $values = $entry['values'];
+                $level = $values['level'];
+                $parent = $values['parent_id'] ?? null;
+                $expected = $expectedParents[$level] ?? null;
+                $path = "sections.nodes.$operation.$key.values.parent_id";
+
+                if ($level === 'goal') {
+                    if ($parent !== null && $parent !== '') {
+                        $validator->errors()->add($path, 'Goal tidak memiliki induk.');
+                    }
+
+                    continue;
+                }
+
+                if ($parent === null || $parent === '') {
+                    $validator->errors()->add($path, 'Pilih induk satu tingkat di atas.');
+
+                    continue;
+                }
+
+                if (is_string($parent) && str_starts_with($parent, '@draft:')) {
+                    $draftKey = substr($parent, 7);
+                    if (($draftLevels[$draftKey] ?? null) !== $expected) {
+                        $validator->errors()->add($path, 'Induk LFA harus berada satu tingkat di atas.');
+                    }
+
+                    continue;
+                }
+
+                $parentId = (int) $parent;
+                $parentLevel = $updatedLevels[$parentId] ?? DB::table('sroi_lfa_nodes')
+                    ->where('company_id', $program->company_id)
+                    ->where('program_id', $program->id)
+                    ->where('id', $parentId)
+                    ->value('level');
+
+                if (in_array($parentId, $deletedIds, true) || $parentLevel !== $expected) {
+                    $validator->errors()->add($path, 'Induk LFA harus berada satu tingkat di atas.');
+                }
+            }
+        }
     }
 
     private function valueRules(string $descriptor, SroiProgram $program, string $field): array
@@ -173,6 +239,7 @@ class SaveStageBatchRequest extends FormRequest
     {
         $uniqueRules = [
             'targets' => ['sroi_roadmap_targets', ['roadmap_item_id', 'year']],
+            'investment-years' => ['sroi_program_investment_years', ['investment_id', 'year']],
             'impact-years' => ['sroi_outcome_impact_years', ['outcome_id', 'period_type', 'year']],
         ];
 
@@ -187,7 +254,7 @@ class SaveStageBatchRequest extends FormRequest
                 $updated[(int) $entry['id']] = $entry['values'];
             }
             $query = DB::table($table)->where('company_id', $program->company_id);
-            if ($section === 'targets') {
+            if (in_array($section, ['targets', 'investment-years'], true)) {
                 $query->where('program_id', $program->id);
             } else {
                 $query->whereIn('outcome_id', DB::table('sroi_program_outcomes')->where('company_id', $program->company_id)->where('program_id', $program->id)->select('id'));
@@ -206,6 +273,36 @@ class SaveStageBatchRequest extends FormRequest
             }
             foreach ($entries['create'] as $key => $entry) {
                 $this->recordUniqueSignature($validator, $seen, $section, 'create', (string) $key, $entry['values'], $uniqueFields);
+            }
+        }
+    }
+
+    private function validateScopePeriods(Validator $validator): void
+    {
+        if ($this->route('stage') !== 'scope') {
+            return;
+        }
+
+        foreach (['create', 'update'] as $operation) {
+            foreach ($this->input("sections.scopes.$operation", []) as $key => $entry) {
+                $values = $entry['values'];
+                foreach (['evaluative', 'forecast'] as $period) {
+                    $start = $values[$period.'_start_year'] ?? null;
+                    $end = $values[$period.'_end_year'] ?? null;
+                    $active = $values['assessment_type'] === $period || $values['assessment_type'] === 'both';
+                    if ($active && ($start === null || $end === null || $start > $end)) {
+                        $validator->errors()->add("sections.scopes.$operation.$key.values.".$period.'_end_year', 'Periode aktif harus memiliki awal dan akhir yang berurutan.');
+                    }
+                    if (! $active && ($start !== null || $end !== null)) {
+                        $validator->errors()->add("sections.scopes.$operation.$key.values.".$period.'_start_year', 'Tahun periode tidak aktif harus kosong.');
+                    }
+                }
+                if ($values['assessment_type'] === 'both'
+                    && ($values['forecast_start_year'] ?? null) !== null
+                    && ($values['evaluative_end_year'] ?? null) !== null
+                    && $values['forecast_start_year'] <= $values['evaluative_end_year']) {
+                    $validator->errors()->add("sections.scopes.$operation.$key.values.forecast_start_year", 'Forecast harus dimulai setelah periode evaluasi.');
+                }
             }
         }
     }
@@ -229,11 +326,21 @@ class SaveStageBatchRequest extends FormRequest
             foreach ($this->input('sections.impact-years.'.$operation) as $key => $entry) {
                 $values = $entry['values'];
                 foreach (['indicator_id' => 'sroi_outcome_indicators', 'financial_proxy_id' => 'sroi_financial_proxies'] as $field => $table) {
-                    $valid = DB::table($table)
-                        ->where('company_id', $program->company_id)
-                        ->where('outcome_id', $values['outcome_id'])
-                        ->where('id', $values[$field])
-                        ->exists();
+                    $section = $field === 'indicator_id' ? 'indicators' : 'proxies';
+                    $reference = $values[$field];
+                    if (is_string($reference) && str_starts_with($reference, '@draft:')) {
+                        $draft = $this->input('sections.'.$section.'.create.'.substr($reference, 7).'.values');
+                        $valid = is_array($draft) && (string) ($draft['outcome_id'] ?? '') === (string) $values['outcome_id'];
+                    } else {
+                        $updated = $this->input('sections.'.$section.'.update.'.$reference.'.values');
+                        $valid = $updated
+                            ? (string) $updated['outcome_id'] === (string) $values['outcome_id']
+                            : DB::table($table)
+                                ->where('company_id', $program->company_id)
+                                ->where('outcome_id', $values['outcome_id'])
+                                ->where('id', $reference)
+                                ->exists();
+                    }
                     if (! $valid) {
                         $validator->errors()->add("sections.impact-years.$operation.$key.values.$field", 'Pilihan harus sesuai dengan outcome.');
                     }

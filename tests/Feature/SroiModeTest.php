@@ -97,6 +97,59 @@ it('allows editing an existing program after its category is deactivated', funct
     expect($program->fresh()->name)->toBe('Nama Baru');
 });
 
+it('saves program details with a document in one request', function () {
+    Storage::fake('local');
+    $company = Company::create(['name' => 'A']);
+    $user = User::factory()->create(['company_id' => $company->id, 'role' => 'company', 'is_active' => true]);
+    $program = sroiProgram($company, $user);
+
+    $this->actingAs($user)->post(route('sroi.programs.update', $program), [
+        '_method' => 'PUT', 'category_id' => $program->category_id, 'name' => 'Program Terbaru',
+        'pillar_name' => $program->pillar_name, 'initiator_owner_name' => $program->initiator_owner_name,
+        'start_year' => $program->start_year, 'end_year' => $program->end_year,
+        'description' => 'Deskripsi terbaru', 'boundary_text' => $program->boundary_text, 'status' => 'draft',
+        'document' => UploadedFile::fake()->image('proposal.jpg'),
+    ])->assertRedirect()->assertSessionHasNoErrors();
+
+    $document = DB::table('sroi_program_documents')->first();
+    expect($program->fresh()->description)->toBe('Deskripsi terbaru')
+        ->and($document->stage)->toBe('description');
+    Storage::disk('local')->assertExists($document->object_key);
+});
+
+it('rejects invalid program documents without changing the description', function () {
+    Storage::fake('local');
+    $company = Company::create(['name' => 'A']);
+    $user = User::factory()->create(['company_id' => $company->id, 'role' => 'company', 'is_active' => true]);
+    $program = sroiProgram($company, $user);
+
+    $this->actingAs($user)->post(route('sroi.programs.update', $program), [
+        '_method' => 'PUT', 'category_id' => $program->category_id, 'name' => $program->name,
+        'pillar_name' => $program->pillar_name, 'initiator_owner_name' => $program->initiator_owner_name,
+        'start_year' => $program->start_year, 'end_year' => $program->end_year,
+        'description' => 'Tidak boleh tersimpan', 'boundary_text' => $program->boundary_text, 'status' => 'draft',
+        'document' => UploadedFile::fake()->create('script.txt'),
+    ])->assertSessionHasErrors('document');
+
+    expect($program->fresh()->description)->toBe('Uraian')
+        ->and(DB::table('sroi_program_documents')->count())->toBe(0);
+});
+
+it('shows documents from every stage in General Description', function () {
+    Storage::fake('local');
+    $company = Company::create(['name' => 'A']);
+    $user = User::factory()->create(['company_id' => $company->id, 'role' => 'company', 'is_active' => true]);
+    $program = sroiProgram($company, $user);
+
+    $this->actingAs($user)->post(route('sroi.documents.store', [$program, 'theory-of-change']), [
+        'document' => UploadedFile::fake()->image('theory.jpg'),
+    ])->assertRedirect();
+
+    $this->get(route('sroi.programs.stage', [$program, 'description']))->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('Sroi/GeneralDescription')
+            ->where('documents.0.file_name', 'theory.jpg'));
+});
+
 it('saves a stage and prevents cross-company reads and writes', function () {
     $first = Company::create(['name' => 'A']);
     $second = Company::create(['name' => 'B']);

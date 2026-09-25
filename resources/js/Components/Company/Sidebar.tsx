@@ -1,7 +1,5 @@
-import Modal from '@/Components/Modal';
-import { Link, router } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { ReactNode, useState } from 'react';
+import { Link } from '@inertiajs/react';
+import { ReactNode } from 'react';
 import Icon from './Icon';
 
 interface NavItemProps {
@@ -9,6 +7,7 @@ interface NavItemProps {
     icon: string;
     label: string;
     active?: boolean;
+    disabled?: boolean;
     roles?: string[];
     hideForRoles?: string[];
 }
@@ -16,14 +15,7 @@ interface NavItemProps {
 interface SidebarProps {
     currentRoute?: string;
     collapsed?: boolean;
-    onToggleCollapse?: () => void;
-    user: {
-        companyName?: string;
-        name: string;
-        email: string;
-        avatar?: string;
-        role: string;
-    };
+    user: { role: string };
 }
 
 const navItems: NavItemProps[] = [
@@ -67,14 +59,37 @@ function NavItem({
     icon,
     label,
     active = false,
+    disabled = false,
     collapsed = false,
 }: NavItemProps & { collapsed?: boolean }): ReactNode {
     const baseClasses = collapsed
-        ? 'flex h-10 items-center justify-center rounded-lg transition-all'
+        ? 'flex h-12 items-center justify-center rounded-lg transition-all'
         : 'flex items-center gap-4 rounded-lg px-4 py-3 transition-all';
-    const activeClasses = active
-        ? 'bg-white/15 ring-1 ring-white/20'
-        : 'hover:bg-white/10';
+    const activeClasses = disabled
+        ? 'cursor-not-allowed opacity-40'
+        : active
+          ? 'bg-white/15 ring-1 ring-white/20'
+          : 'hover:bg-white/10';
+    const content = (
+        <>
+            <Icon name={icon} />
+            {!collapsed && <span className="font-medium">{label}</span>}
+        </>
+    );
+
+    if (disabled) {
+        return (
+            <span
+                className={`${baseClasses} ${activeClasses}`}
+                role="link"
+                aria-disabled="true"
+                aria-label={label}
+                title="Pilih program terlebih dahulu"
+            >
+                {content}
+            </span>
+        );
+    }
 
     return (
         <Link
@@ -83,8 +98,7 @@ function NavItem({
             aria-label={label}
             title={collapsed ? label : undefined}
         >
-            <Icon name={icon} />
-            {!collapsed && <span className="font-medium">{label}</span>}
+            {content}
         </Link>
     );
 }
@@ -92,19 +106,22 @@ function NavItem({
 export default function Sidebar({
     currentRoute,
     collapsed = false,
-    onToggleCollapse,
     user,
 }: SidebarProps): ReactNode {
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
-
-    const handleLogout = () => {
-        router.post(route('logout'));
-    };
-
     const sroiMode = currentRoute?.startsWith('/sroi');
     const programId = currentRoute?.match(/^\/sroi\/program\/(\d+)/)?.[1];
     const stageHref = (stage: string) =>
         programId ? `/sroi/program/${programId}/${stage}` : '/sroi/program';
+    const stageItem = (
+        stage: string,
+        icon: string,
+        label: string,
+    ): NavItemProps => ({
+        href: stageHref(stage),
+        icon,
+        label,
+        disabled: !programId,
+    });
     const sroiGroups: { heading: string; items: NavItemProps[] }[] = [
         {
             heading: 'Utama',
@@ -115,58 +132,34 @@ export default function Sidebar({
                     icon: 'list_alt',
                     label: 'Program List',
                 },
-                {
-                    href: stageHref('report'),
-                    icon: 'description',
-                    label: 'SROI Report',
-                },
+                stageItem('report', 'description', 'SROI Report'),
             ],
         },
         {
             heading: 'Perencanaan',
             items: [
-                {
-                    href: stageHref('description'),
-                    icon: 'article',
-                    label: 'General Description',
-                },
-                {
-                    href: stageHref('theory-of-change'),
-                    icon: 'account_tree',
-                    label: 'Theory of Change',
-                },
-                { href: stageHref('lfa'), icon: 'schema', label: 'LFA' },
-                { href: stageHref('roadmap'), icon: 'route', label: 'Roadmap' },
+                stageItem('description', 'article', 'General Description'),
+                stageItem(
+                    'theory-of-change',
+                    'account_tree',
+                    'Theory of Change',
+                ),
+                stageItem('lfa', 'schema', 'LFA'),
+                stageItem('roadmap', 'route', 'Roadmap'),
             ],
         },
         {
             heading: 'Penilaian',
             items: [
-                {
-                    href: stageHref('scope'),
-                    icon: 'fact_check',
-                    label: 'Program Scope',
-                },
-                {
-                    href: stageHref('stakeholder'),
-                    icon: 'groups',
-                    label: 'Stakeholder Identification',
-                },
-                {
-                    href: stageHref('outcome'),
-                    icon: 'checklist',
-                    label: 'Outcome Identification',
-                },
-                {
-                    href: stageHref('table'),
-                    icon: 'table_chart',
-                    label: 'SROI Table',
-                },
-                {
-                    href: stageHref('calculation'),
-                    icon: 'calculate',
-                    label: 'SROI Calculation',
-                },
+                stageItem('scope', 'fact_check', 'Program Scope'),
+                stageItem(
+                    'stakeholder',
+                    'groups',
+                    'Stakeholder Identification',
+                ),
+                stageItem('outcome', 'checklist', 'Outcome Identification'),
+                stageItem('table', 'table_chart', 'SROI Table'),
+                stageItem('calculation', 'calculate', 'SROI Calculation'),
             ],
         },
         {
@@ -190,53 +183,44 @@ export default function Sidebar({
 
     return (
         <aside
-            className={`relative z-10 flex flex-shrink-0 flex-col bg-primary text-white transition-all duration-300 ${
-                collapsed ? 'w-14 items-center' : 'w-72'
+            id="app-sidebar"
+            className={`flex flex-shrink-0 flex-col bg-primary text-white transition-all duration-300 ${
+                collapsed
+                    ? 'relative z-10 w-14 items-center'
+                    : 'fixed bottom-0 left-0 top-20 z-30 w-72 md:relative md:inset-auto md:z-10'
             }`}
         >
             <div
                 className={`flex items-center border-b border-white/10 ${
-                    collapsed
-                        ? 'justify-center px-2 py-4'
-                        : 'justify-between px-6 py-6'
+                    collapsed ? 'justify-center px-2 py-5' : 'px-6 py-6'
                 }`}
             >
-                {!collapsed && (
-                    <a
-                        href="/"
-                        className="flex items-center justify-center overflow-hidden"
-                    >
-                        <img
-                            src="/img/LogoHeader.svg"
-                            alt="Logo"
-                            className="h-10 w-auto opacity-75 brightness-0 invert filter"
-                        />
-                    </a>
-                )}
-                {onToggleCollapse && (
-                    <button
-                        type="button"
-                        onClick={onToggleCollapse}
-                        className={`absolute top-3 flex size-7 items-center justify-center rounded-md bg-white/10 transition-colors hover:bg-white/20 ${
-                            collapsed ? 'right-1.5' : 'right-4'
-                        }`}
-                        aria-label={
-                            collapsed ? 'Buka sidebar' : 'Tutup sidebar'
+                <Link
+                    href="/"
+                    className="flex items-center justify-center overflow-hidden"
+                    aria-label="Beranda"
+                >
+                    <img
+                        src={
+                            collapsed
+                                ? '/img/LogoTab.svg'
+                                : '/img/LogoHeader.svg'
                         }
-                        title={collapsed ? 'Buka sidebar' : 'Tutup sidebar'}
-                    >
-                        {collapsed ? (
-                            <ChevronRight className="size-4" />
-                        ) : (
-                            <ChevronLeft className="size-4" />
-                        )}
-                    </button>
-                )}
+                        alt="Logo"
+                        className={
+                            collapsed
+                                ? 'size-9 object-contain'
+                                : 'h-10 w-auto opacity-75 brightness-0 invert filter'
+                        }
+                    />
+                </Link>
             </div>
 
             <nav
-                className={`flex-1 space-y-1 overflow-y-auto ${
-                    collapsed ? 'w-full px-2 py-4' : 'mt-4 px-4'
+                className={`flex-1 overflow-y-auto ${
+                    collapsed
+                        ? 'w-full space-y-2 px-2 py-5'
+                        : 'mt-4 space-y-1 px-4'
                 }`}
             >
                 {sroiMode && (
@@ -300,87 +284,6 @@ export default function Sidebar({
                               />
                           ))}
             </nav>
-
-            {!collapsed && (
-                <div className="border-t border-white/10 p-6">
-                    <div className="flex items-center gap-3 rounded-xl bg-white/10 p-3">
-                        <div
-                            className="size-10 rounded-full bg-white/20 bg-cover bg-center"
-                            style={{
-                                backgroundImage: user.avatar
-                                    ? `url("${user.avatar}")`
-                                    : undefined,
-                            }}
-                        >
-                            {!user.avatar && (
-                                <div className="flex size-full items-center justify-center">
-                                    <Icon
-                                        name="person"
-                                        className="text-white/70"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                        <div className="min-w-0 flex-1 overflow-hidden">
-                            <p className="truncate text-sm font-bold">
-                                {user.companyName ?? user.name ?? 'Admin'}
-                            </p>
-                            <p className="truncate text-xs opacity-70">
-                                {user.email ?? 'admin@gmail.com'}
-                            </p>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => setShowLogoutModal(true)}
-                            className="group flex size-10 items-center justify-center rounded-lg bg-white/5 transition-all hover:bg-white/20"
-                            title="Logout"
-                            aria-label="Logout"
-                        >
-                            <Icon
-                                name="logout"
-                                className="text-[20px] text-white/60 transition-colors group-hover:text-white"
-                            />
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            <Modal
-                show={showLogoutModal}
-                onClose={() => setShowLogoutModal(false)}
-                maxWidth="sm"
-            >
-                <div className="p-6">
-                    <div className="mb-4 flex items-center justify-center">
-                        <div className="flex size-14 items-center justify-center rounded-full bg-red-100 text-red-600">
-                            <Icon name="logout" className="text-3xl" />
-                        </div>
-                    </div>
-                    <h3 className="mb-2 text-center text-lg font-bold text-gray-900">
-                        Konfirmasi Logout
-                    </h3>
-                    <p className="mb-6 text-center text-sm text-gray-600">
-                        Apakah Anda yakin ingin keluar dari aplikasi? Anda harus
-                        login kembali untuk mengakses sistem.
-                    </p>
-                    <div className="flex gap-3">
-                        <button
-                            type="button"
-                            onClick={() => setShowLogoutModal(false)}
-                            className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-100"
-                        >
-                            Batal
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleLogout}
-                            className="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-red-700 focus:ring-2 focus:ring-red-200"
-                        >
-                            Ya, Keluar
-                        </button>
-                    </div>
-                </div>
-            </Modal>
         </aside>
     );
 }

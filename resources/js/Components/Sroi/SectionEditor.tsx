@@ -1,5 +1,6 @@
+import Modal from '@/Components/Modal';
 import { router, useForm } from '@inertiajs/react';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, ReactNode, useEffect, useState } from 'react';
 import type { Choice, Program, Row, Section, Value } from './types';
 
 const fieldLabel = (field: string) =>
@@ -8,10 +9,12 @@ export default function SectionEditor({
     section,
     program,
     canEdit,
+    embedded = false,
 }: {
     section: Section;
     program: Program;
     canEdit: boolean;
+    embedded?: boolean;
 }) {
     const [editing, setEditing] = useState<number | null>(null);
     const [open, setOpen] = useState(false);
@@ -118,9 +121,28 @@ export default function SectionEditor({
                 options,
             );
     };
+    const inLocationModal = (content: ReactNode) =>
+        section.key === 'locations' ? (
+            <Modal show={open} onClose={() => setOpen(false)}>
+                <div className="p-5">
+                    <h3 className="text-lg font-semibold">
+                        {editing ? 'Ubah' : 'Tambah'} {section.title}
+                    </h3>
+                    {content}
+                </div>
+            </Modal>
+        ) : (
+            content
+        );
 
     return (
-        <section className="rounded-xl border border-slate-200 bg-white p-5">
+        <section
+            className={
+                embedded
+                    ? 'border-t border-slate-100 pt-4'
+                    : 'rounded-xl border border-slate-200 bg-white p-5'
+            }
+        >
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 className="text-lg font-bold text-slate-900">
@@ -205,177 +227,195 @@ export default function SectionEditor({
                     ))}
                 </div>
             )}
-            {open && (
-                <form
-                    onSubmit={submit}
-                    className="mt-5 grid gap-4 border-t border-slate-200 pt-5 md:grid-cols-2"
-                >
-                    {fields.map(([field, descriptor]) => {
-                        const optional = descriptor.endsWith('?');
-                        const [kind, values] = descriptor
-                            .replace(/\?$/, '')
-                            .split(':');
-                        const options: Choice[] =
-                            kind === 'enum'
-                                ? values
-                                      .split(',')
-                                      .map((name) => ({ id: name, name }))
-                                : (areaChoices[field] ??
-                                  section.choices[field] ??
-                                  []);
-                        const filtered = [
-                            'indicator_id',
-                            'financial_proxy_id',
-                        ].includes(field)
-                            ? options.filter(
-                                  (option) =>
-                                      option.outcome_id ===
-                                      Number(form.data.outcome_id),
-                              )
-                            : options;
-                        const label = fieldLabel(field);
-                        const common =
-                            'mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-primary focus:ring-primary';
-                        return (
-                            <label
-                                key={field}
-                                className="text-sm font-medium text-slate-700"
-                            >
-                                {label}
-                                {optional ? ' (opsional)' : ''}
-                                {kind === 'text' ? (
-                                    <textarea
-                                        value={String(form.data[field] ?? '')}
-                                        onChange={(event) =>
-                                            form.setData(
-                                                field,
-                                                event.target.value,
-                                            )
-                                        }
-                                        required={!optional}
-                                        className={common}
-                                        rows={3}
-                                    />
-                                ) : kind === 'enum' ||
-                                  kind === 'reference' ||
-                                  kind === 'boolean' ? (
-                                    <select
-                                        value={
-                                            kind === 'boolean'
-                                                ? String(
-                                                      form.data[field] ?? false,
-                                                  )
-                                                : String(form.data[field] ?? '')
-                                        }
-                                        onChange={(event) =>
-                                            change(
-                                                field,
+            {open &&
+                inLocationModal(
+                    <form
+                        onSubmit={submit}
+                        className={
+                            section.key === 'locations'
+                                ? 'mt-4 grid max-h-[70vh] gap-4 overflow-y-auto md:grid-cols-2'
+                                : 'mt-5 grid gap-4 border-t border-slate-200 pt-5 md:grid-cols-2'
+                        }
+                    >
+                        {fields.map(([field, descriptor]) => {
+                            const optional = descriptor.endsWith('?');
+                            const [kind, values] = descriptor
+                                .replace(/\?$/, '')
+                                .split(':');
+                            const options: Choice[] =
+                                kind === 'enum'
+                                    ? values.split(',').map((name) => ({
+                                          id: name,
+                                          name,
+                                      }))
+                                    : (areaChoices[field] ??
+                                      section.choices[field] ??
+                                      []);
+                            const filtered = [
+                                'indicator_id',
+                                'financial_proxy_id',
+                            ].includes(field)
+                                ? options.filter(
+                                      (option) =>
+                                          option.outcome_id ===
+                                          Number(form.data.outcome_id),
+                                  )
+                                : options;
+                            const label = fieldLabel(field);
+                            const common =
+                                'mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-primary focus:ring-primary';
+                            return (
+                                <label
+                                    key={field}
+                                    className="text-sm font-medium text-slate-700"
+                                >
+                                    {label}
+                                    {optional ? ' (opsional)' : ''}
+                                    {kind === 'text' ? (
+                                        <textarea
+                                            value={String(
+                                                form.data[field] ?? '',
+                                            )}
+                                            onChange={(event) =>
+                                                form.setData(
+                                                    field,
+                                                    event.target.value,
+                                                )
+                                            }
+                                            required={!optional}
+                                            className={common}
+                                            rows={3}
+                                        />
+                                    ) : kind === 'enum' ||
+                                      kind === 'reference' ||
+                                      kind === 'boolean' ? (
+                                        <select
+                                            value={
                                                 kind === 'boolean'
-                                                    ? event.target.value ===
-                                                          'true'
-                                                    : event.target.value,
-                                            )
-                                        }
-                                        required={!optional}
-                                        className={common}
-                                    >
-                                        <option value="">Pilih {label}</option>
-                                        {kind === 'boolean' ? (
-                                            <>
-                                                <option value="true">Ya</option>
-                                                <option value="false">
-                                                    Tidak
-                                                </option>
-                                            </>
-                                        ) : (
-                                            filtered.map((option) => (
-                                                <option
-                                                    key={option.id}
-                                                    value={option.id}
-                                                >
-                                                    {option.name}
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                ) : (
-                                    <input
-                                        type={
-                                            [
-                                                'year',
-                                                'money',
-                                                'number',
-                                                'percent',
-                                                'decimal',
-                                            ].includes(kind)
-                                                ? 'number'
-                                                : 'text'
-                                        }
-                                        step={
-                                            kind === 'year'
-                                                ? 1
-                                                : kind === 'money'
-                                                  ? '0.01'
-                                                  : 'any'
-                                        }
-                                        min={
-                                            kind === 'year'
-                                                ? program.start_year
-                                                : [
-                                                        'money',
-                                                        'number',
-                                                        'percent',
-                                                    ].includes(kind)
-                                                  ? 0
-                                                  : undefined
-                                        }
-                                        max={
-                                            kind === 'year'
-                                                ? program.end_year
-                                                : kind === 'percent'
-                                                  ? 100
-                                                  : undefined
-                                        }
-                                        value={String(form.data[field] ?? '')}
-                                        onChange={(event) =>
-                                            form.setData(
-                                                field,
-                                                event.target.value,
-                                            )
-                                        }
-                                        required={!optional}
-                                        className={common}
-                                    />
-                                )}
-                                {form.errors[field] && (
-                                    <span
-                                        role="alert"
-                                        className="mt-1 block text-red-600"
-                                    >
-                                        {form.errors[field]}
-                                    </span>
-                                )}
-                            </label>
-                        );
-                    })}
-                    <div className="flex gap-2 md:col-span-2">
-                        <button
-                            type="submit"
-                            disabled={form.processing}
-                            className="rounded-lg bg-primary px-4 py-2 font-semibold text-white disabled:opacity-50"
-                        >
-                            Simpan
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setOpen(false)}
-                            className="rounded-lg border border-slate-300 px-4 py-2"
-                        >
-                            Batal
-                        </button>
-                    </div>
-                </form>
-            )}
+                                                    ? String(
+                                                          form.data[field] ??
+                                                              false,
+                                                      )
+                                                    : String(
+                                                          form.data[field] ??
+                                                              '',
+                                                      )
+                                            }
+                                            onChange={(event) =>
+                                                change(
+                                                    field,
+                                                    kind === 'boolean'
+                                                        ? event.target.value ===
+                                                              'true'
+                                                        : event.target.value,
+                                                )
+                                            }
+                                            required={!optional}
+                                            className={common}
+                                        >
+                                            <option value="">
+                                                Pilih {label}
+                                            </option>
+                                            {kind === 'boolean' ? (
+                                                <>
+                                                    <option value="true">
+                                                        Ya
+                                                    </option>
+                                                    <option value="false">
+                                                        Tidak
+                                                    </option>
+                                                </>
+                                            ) : (
+                                                filtered.map((option) => (
+                                                    <option
+                                                        key={option.id}
+                                                        value={option.id}
+                                                    >
+                                                        {option.name}
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                    ) : (
+                                        <input
+                                            type={
+                                                [
+                                                    'year',
+                                                    'money',
+                                                    'number',
+                                                    'percent',
+                                                    'decimal',
+                                                ].includes(kind)
+                                                    ? 'number'
+                                                    : 'text'
+                                            }
+                                            step={
+                                                kind === 'year'
+                                                    ? 1
+                                                    : kind === 'money'
+                                                      ? '0.01'
+                                                      : 'any'
+                                            }
+                                            min={
+                                                kind === 'year'
+                                                    ? program.start_year
+                                                    : [
+                                                            'money',
+                                                            'number',
+                                                            'percent',
+                                                        ].includes(kind)
+                                                      ? 0
+                                                      : undefined
+                                            }
+                                            max={
+                                                kind === 'year'
+                                                    ? program.end_year
+                                                    : kind === 'percent'
+                                                      ? 100
+                                                      : undefined
+                                            }
+                                            value={String(
+                                                form.data[field] ?? '',
+                                            )}
+                                            onChange={(event) =>
+                                                form.setData(
+                                                    field,
+                                                    event.target.value,
+                                                )
+                                            }
+                                            required={!optional}
+                                            className={common}
+                                        />
+                                    )}
+                                    {form.errors[field] && (
+                                        <span
+                                            role="alert"
+                                            className="mt-1 block text-red-600"
+                                        >
+                                            {form.errors[field]}
+                                        </span>
+                                    )}
+                                </label>
+                            );
+                        })}
+                        <div className="flex gap-2 md:col-span-2">
+                            <button
+                                type="submit"
+                                disabled={form.processing}
+                                className="rounded-lg bg-primary px-4 py-2 font-semibold text-white disabled:opacity-50"
+                            >
+                                Simpan
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setOpen(false)}
+                                className="rounded-lg border border-slate-300 px-4 py-2"
+                            >
+                                Batal
+                            </button>
+                        </div>
+                    </form>,
+                )}
         </section>
     );
 }

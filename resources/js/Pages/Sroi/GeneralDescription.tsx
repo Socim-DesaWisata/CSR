@@ -28,26 +28,13 @@ export default function GeneralDescription({
             exports={exports}
             canEdit={canEdit}
         >
-            {canEdit ? (
-                <DescriptionEditor program={program} isAdmin={isAdmin} />
-            ) : (
-                <div className="rounded-xl border border-slate-200 bg-white p-5">
-                    <h2 className="font-bold">Deskripsi Program</h2>
-                    <p className="mt-2 whitespace-pre-wrap text-sm">
-                        {program.description}
-                    </p>
-                    <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
-                        Batas: {program.boundary_text}
-                    </p>
-                </div>
-            )}
-            {locations && (
-                <SectionEditor
-                    section={locations}
-                    program={program}
-                    canEdit={canEdit}
-                />
-            )}
+            <DescriptionEditor
+                program={program}
+                isAdmin={isAdmin}
+                canEdit={canEdit}
+                locations={locations}
+                documents={documents}
+            />
             {members && (
                 <SectionEditor
                     section={members}

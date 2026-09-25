@@ -125,7 +125,12 @@ class StoreStageRequest extends FormRequest
                     $validator->errors()->add('assessment_type', 'Cakupan program sudah ada; gunakan Ubah.');
                 }
                 foreach (['evaluative', 'forecast'] as $period) {
-                    if ($this->filled($period.'_start_year') && $this->filled($period.'_end_year') && $this->integer($period.'_start_year') > $this->integer($period.'_end_year')) {
+                    $active = $this->input('assessment_type') === $period || $this->input('assessment_type') === 'both';
+                    if ($active && (! $this->filled($period.'_start_year') || ! $this->filled($period.'_end_year'))) {
+                        $validator->errors()->add($period.'_start_year', 'Periode aktif harus memiliki tahun awal dan akhir.');
+                    } elseif (! $active && ($this->filled($period.'_start_year') || $this->filled($period.'_end_year'))) {
+                        $validator->errors()->add($period.'_start_year', 'Tahun periode tidak aktif harus kosong.');
+                    } elseif ($this->filled($period.'_start_year') && $this->filled($period.'_end_year') && $this->integer($period.'_start_year') > $this->integer($period.'_end_year')) {
                         $validator->errors()->add($period.'_end_year', 'Tahun akhir harus setelah tahun awal.');
                     }
                 }

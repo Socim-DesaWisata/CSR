@@ -606,6 +606,12 @@ export default function StageDataTables({
                                             ];
                                         const label = `${fieldLabel(field)} baris ${index + 1}`;
                                         const value = row.values[field];
+                                        const borderlessStakeholderField =
+                                            stage === 'stakeholder' &&
+                                            [
+                                                'stakeholder_category_list_id',
+                                                'included',
+                                            ].includes(field);
 
                                         return (
                                             <td
@@ -680,7 +686,11 @@ export default function StageDataTables({
                                                             disabled={
                                                                 processing
                                                             }
-                                                            className="block min-h-8 w-full rounded border-slate-300 px-2 py-1 text-xs text-slate-900 focus:border-[#006b3d] focus:ring-[#006b3d]"
+                                                            className={
+                                                                borderlessStakeholderField
+                                                                    ? 'block min-h-6 w-full border-0 bg-transparent p-0 text-sm leading-5 text-slate-900 focus:ring-2 focus:ring-[#006b3d]'
+                                                                    : 'block min-h-8 w-full rounded border-slate-300 px-2 py-1 text-xs text-slate-900 focus:border-[#006b3d] focus:ring-[#006b3d]'
+                                                            }
                                                         >
                                                             <option value="">
                                                                 Pilih{' '}

@@ -7,9 +7,11 @@ use App\Http\Requests\Sroi\StoreDocumentRequest;
 use App\Models\SroiProgram;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
@@ -17,10 +19,16 @@ class DocumentController extends Controller
 {
     public function store(StoreDocumentRequest $request, SroiProgram $program, string $stage): RedirectResponse
     {
-        $file = $request->file('document');
+        $this->storeFile($request, $program, $request->file('document'), $stage);
+
+        return back();
+    }
+
+    public function storeFile(Request $request, SroiProgram $program, UploadedFile $file, string $stage): string
+    {
         $key = 'sroi/documents/'.$program->company_id.'/'.$program->id.'/'.Str::uuid().'.'.$file->extension();
         if (! Storage::disk('local')->putFileAs(dirname($key), $file, basename($key))) {
-            return back()->withErrors(['document' => 'Berkas gagal disimpan.']);
+            throw ValidationException::withMessages(['document' => 'Berkas gagal disimpan.']);
         }
 
         try {
@@ -44,7 +52,7 @@ class DocumentController extends Controller
             throw $exception;
         }
 
-        return back();
+        return $key;
     }
 
     public function download(Request $request, SroiProgram $program, int $document): StreamedResponse

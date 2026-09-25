@@ -313,7 +313,6 @@ function TheoryTable({
             documents={documents}
             exports={exports}
             canEdit={canEdit}
-            showExport={false}
         >
             <div className="space-y-0 bg-white text-slate-900">
                 <div

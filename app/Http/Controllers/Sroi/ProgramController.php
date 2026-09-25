@@ -9,8 +9,10 @@ use App\Models\SroiProgram;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class ProgramController extends Controller
 {
@@ -75,12 +77,26 @@ class ProgramController extends Controller
         $this->access($request, $program, true);
         $before = $program->toArray();
         $data = $request->validated();
+        $file = $data['document'] ?? null;
+        unset($data['document']);
         $data['company_id'] = $request->user()->role === 'company' ? $request->user()->company_id : $data['company_id'];
         abort_unless((int) $data['company_id'] === (int) $program->company_id, 422);
-        DB::transaction(function () use ($program, $data, $request, $before): void {
-            $program->update($data);
-            $this->audit($program, $request, 'update', $before);
-        });
+        $documentKey = null;
+        try {
+            DB::transaction(function () use ($program, $data, $request, $before, $file, &$documentKey): void {
+                $program->update($data);
+                $this->audit($program, $request, 'update', $before);
+                if ($file) {
+                    $documentKey = app(DocumentController::class)->storeFile($request, $program, $file, 'description');
+                }
+            });
+        } catch (Throwable $exception) {
+            if ($documentKey) {
+                Storage::disk('local')->delete($documentKey);
+            }
+
+            throw $exception;
+        }
 
         return back();
     }
