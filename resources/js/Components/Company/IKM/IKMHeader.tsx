@@ -20,8 +20,7 @@ export default function IKMHeader({
                     </h1>
                 </div>
                 <p className="text-sm text-slate-500">
-                    Analitik kepercayaan masyarakat dan penilaian Social License
-                    to Operate untuk Surabaya 2026.
+                    Analitik Indeks Kepercayaan Masyarakat.
                 </p>
             </div>
 
