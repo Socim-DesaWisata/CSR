@@ -3,15 +3,17 @@ import { PropsWithChildren } from 'react';
 export default function Guest({ children }: PropsWithChildren) {
     return (
         <div className="flex h-screen w-full overflow-hidden font-sans">
-            {/* Left side: Dark image panel */}
-            <div
-                className="relative hidden w-[58%] flex-shrink-0 bg-slate-900 lg:flex lg:flex-col"
-                style={{
-                    backgroundImage: "url('/img/LoginPic.png')",
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                }}
-            >
+            <div className="relative hidden w-[58%] flex-shrink-0 bg-slate-900 lg:flex lg:flex-col">
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+                >
+                    <source src="/img/animation.webm" type="video/webm" />
+                </video>
                 {/* Dark overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/30 to-slate-900/80" />
 

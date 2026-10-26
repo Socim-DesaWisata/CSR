@@ -20,8 +20,8 @@ export default function SLOIHeader({
                     </h1>
                 </div>
                 <p className="text-sm text-slate-500">
-                    Analitik kepercayaan masyarakat dan penilaian Social License
-                    to Operate untuk Surabaya 2026.
+                    Analitik penilaian Social License
+                    to Operate.
                 </p>
             </div>
 
